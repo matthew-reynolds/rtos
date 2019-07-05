@@ -1,4 +1,4 @@
-/*
+/**
  * Default main.c for rtos lab.
  * @author Andrew Morton, 2018
  */
