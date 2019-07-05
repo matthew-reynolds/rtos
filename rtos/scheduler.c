@@ -7,11 +7,14 @@ rtosTaskControlBlock_t* rtos_ready_tasks[RTOS_PRIORITY_COUNT] = {NULL};
 rtosTaskControlBlock_t* rtos_running_task                     = NULL;
 
 rtosPriority_t rtosGetReadyTask(void) {
+
+  // Create a bit vector representing whether each queue is nonempty
   uint32_t queue_vec = 0;
   for (unsigned prio = RTOS_PRIORITY_IDLE; prio < RTOS_PRIORITY_COUNT; prio++) {
     queue_vec |= !!rtos_ready_tasks[prio] << (prio - RTOS_PRIORITY_IDLE);
   }
 
+  // Determine the number of leading zeros in the bit vector
   uint32_t leading_zeros;
   asm("CLZ leading_zeros, queue_vec");
 
@@ -29,7 +32,7 @@ void rtosInvokeScheduler(void) {
   // A higher-priority task is ready, OR
   // An equal-priority task is ready and the timeslice has expired
   if (highest_ready_priority > rtos_running_task->priority
-      || (highest_ready_priority == rtos_running_task && 1 /* Timeslice expired */)) {
+      || (highest_ready_priority == rtos_running_task->priority && 1 /* Timeslice expired */)) {
     // Perform context switch to next task
   }
 }
