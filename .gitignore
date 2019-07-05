@@ -1,5 +1,11 @@
-/Objects
+# Build artifacts
 /DebugConfig
+/Listings
+/Objects
 
+# uVision
 *.uvguix.*
 *.scvd
+
+# vscode
+.vscode
