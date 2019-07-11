@@ -4,6 +4,11 @@
  */
 #include "context.h"
 
+/**
+ * Store the current execution context on the stack
+ *
+ * @return the final value of the stack pointer
+ */
 __asm uint32_t rtosStoreContext(void) {
   // clang-format off
   MRS   R0,PSP        // Move PSP coprocessor register to R0
@@ -12,6 +17,11 @@ __asm uint32_t rtosStoreContext(void) {
   // clang-format on
 }
 
+/**
+ * Restore the specified execution context from the stack
+ *
+ * @param sp the stack pointer from which to pop the context
+ */
 __asm void rtosRestoreContext(uint32_t sp) {
   // clang-format off
   LDMFD R0!,{R4-R11} // Pop the R4-R11 registers off of the stack at the specified stack pointer
