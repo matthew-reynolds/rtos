@@ -8,12 +8,15 @@
 
 #include <stdint.h>
 
+#include <LPC17xx.h>
+
 #include "status.h"
 
-#define TOTAL_STACK_SIZE 0x8000  // TODO: Check dynamically? Can we pull from startup_LPC17xx.s?
-#define MAIN_STACK_SIZE 0x2000
-#define TASK_STACK_SIZE 0x1000
-#define MAX_TASKS 6
+#define BASE_STACK_PTR *(uint32_t*) (0x00 + SCB->VTOR)
+#define TOTAL_STACK_SIZE 0x2000
+#define MAIN_STACK_SIZE 0x800
+#define TASK_STACK_SIZE 0x400
+#define MAX_TASKS ((TOTAL_STACK_SIZE - MAIN_STACK_SIZE) / TASK_STACK_SIZE)
 
 /// Task priorities
 typedef enum {
@@ -49,9 +52,7 @@ typedef struct rtosTaskControlBlock_tag {
 // Function pointer
 typedef void (*rtosTaskFunc_t)(void* args);
 
-/**
- * Create a new task given the specified function and priority
- */
-uint32_t rtosTaskNew(rtosTaskFunc_t func, rtosPriority_t priority);
+rtosStatus_t rtosTaskNew(rtosTaskControlBlock_t** tcb, rtosTaskFunc_t func, void* arg, rtosPriority_t priority);
+rtosStatus_t rtosTaskDelete(const rtosTaskControlBlock_t* tcb);
 
 #endif  // __RTOS_TASK_H
