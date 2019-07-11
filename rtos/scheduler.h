@@ -1,24 +1,20 @@
 /**
- * Fixed-Priority Preemptive Scheduler
+ * Fixed-priority preemptive scheduler
  * @author Matt Reynolds
  * @author Dawson Hemphill
  */
 #ifndef __RTOS_SCHEDULER_H
 #define __RTOS_SCHEDULER_H
 
+#include "globals.h"
 #include "task.h"
 
+#define SCHEDULER_TIMESLICE 5
 
-extern rtosTaskControlBlock_t* rtos_ready_tasks[RTOS_PRIORITY_COUNT];
-extern rtosTaskControlBlock_t* rtos_running_task;
-
-/**
- * Get the priority of the highest-priority non-empty queue of ready tasks.
- *
- * @returns The priority of the queue, or RTOS_PRIORITY_NONE of no ready tasks found.
- */
-rtosPriority_t rtosGetReadyTask(void);
+rtosPriority_t          rtosGetHighestReadyPriority(void);
+rtosTaskControlBlock_t* rtosGetReadyTask(rtosPriority_t priority);
 
 void rtosInvokeScheduler(void);
+void rtosPerformContextSwitch(void);
 
 #endif  // __RTOS_SCHEDULER_H
