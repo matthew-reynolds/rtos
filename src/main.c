@@ -18,9 +18,9 @@ void task1(void* arg) {
 
 int main(void) {
   rtosInitialize();
-  rtosTaskControlBlock_t* tcb1;
-  rtosTaskControlBlock_t* tcb2;
-  rtosTaskNew(&tcb1, task1, (void*) 1, RTOS_PRIORITY_NORMAL);
-  rtosTaskNew(&tcb2, task1, (void*) 2, RTOS_PRIORITY_NORMAL);
+  rtosTaskHandle_t tcb1;
+  rtosTaskHandle_t tcb2;
+  rtosTaskNew(task1, (void*) 1, RTOS_PRIORITY_NORMAL, &tcb1);
+  rtosTaskNew(task1, (void*) 2, RTOS_PRIORITY_NORMAL, &tcb2);
   rtosBegin();
 }

@@ -11,8 +11,8 @@
 
 #define SCHEDULER_TIMESLICE 5
 
-rtosPriority_t          rtosGetHighestReadyPriority(void);
-rtosTaskControlBlock_t* rtosGetReadyTask(rtosPriority_t priority);
+rtosPriority_t   rtosGetHighestReadyPriority(void);
+rtosTaskHandle_t rtosGetReadyTask(rtosPriority_t priority);
 
 void rtosInvokeScheduler(void);
 void rtosPerformContextSwitch(void);

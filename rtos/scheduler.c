@@ -10,13 +10,13 @@
 #include "globals.h"
 #include "scheduler.h"
 
-rtosTaskControlBlock_t* rtos_inactive_tasks                   = NULL;
-rtosTaskControlBlock_t* rtos_ready_tasks[RTOS_PRIORITY_COUNT] = {NULL};
-rtosTaskControlBlock_t* rtos_running_task                     = NULL;
-rtosTaskControlBlock_t* rtos_blocked_tasks                    = NULL;
-rtosTaskControlBlock_t* rtos_terminated_tasks                 = NULL;
+rtosTaskHandle_t rtos_inactive_tasks                   = NULL;
+rtosTaskHandle_t rtos_ready_tasks[RTOS_PRIORITY_COUNT] = {NULL};
+rtosTaskHandle_t rtos_running_task                     = NULL;
+rtosTaskHandle_t rtos_blocked_tasks                    = NULL;
+rtosTaskHandle_t rtos_terminated_tasks                 = NULL;
 
-rtosTaskControlBlock_t* _next_task = NULL;
+rtosTaskHandle_t _next_task = NULL;
 
 /**
  * Get the priority of the highest-priority non-empty queue of ready tasks.
@@ -42,7 +42,7 @@ rtosPriority_t rtosGetHighestReadyPriority(void) {
 /**
  * Get the ready task with the specified priority
  */
-rtosTaskControlBlock_t* rtosGetReadyTask(rtosPriority_t priority) {
+rtosTaskHandle_t rtosGetReadyTask(rtosPriority_t priority) {
   if (priority == RTOS_PRIORITY_NONE) {
     return NULL;
   }
@@ -83,8 +83,8 @@ void rtosPerformContextSwitch(void) {
 
   // Remove the current task
   // TODO: Only do this when the current task is being preempted
-  rtos_running_task->state          = RTOS_TASK_READY;
-  rtosTaskControlBlock_t* last_task = rtosGetReadyTask(rtos_running_task->priority);
+  rtos_running_task->state   = RTOS_TASK_READY;
+  rtosTaskHandle_t last_task = rtosGetReadyTask(rtos_running_task->priority);
   if (last_task == NULL) {
     rtos_ready_tasks[rtos_running_task->priority - RTOS_PRIORITY_IDLE] = rtos_running_task;
   } else {

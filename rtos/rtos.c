@@ -71,7 +71,7 @@ uint32_t rtosGetSysTickCount(void) {
  */
 void rtosInitialize(void) {
   SysTick_Config(SystemCoreClock / 1000);  // Default 1ms tick
-  rtosTaskNew(NULL, rtosIdleTask, NULL, RTOS_PRIORITY_IDLE);
+  rtosTaskNew(rtosIdleTask, NULL, RTOS_PRIORITY_IDLE, NULL);
 }
 
 /**
@@ -81,8 +81,8 @@ void rtosBegin(void) {
 
   // Add all inactive tasks to the ready list
   while (rtos_inactive_tasks != NULL) {
-    rtosTaskControlBlock_t* tcb = rtos_inactive_tasks;
-    rtos_inactive_tasks         = tcb->next;
+    rtosTaskHandle_t tcb = rtos_inactive_tasks;
+    rtos_inactive_tasks  = tcb->next;
 
     tcb->next                                            = rtosGetReadyTask(tcb->priority);
     rtos_ready_tasks[tcb->priority - RTOS_PRIORITY_IDLE] = tcb;

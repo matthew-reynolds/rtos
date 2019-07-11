@@ -14,25 +14,25 @@ rtosTaskControlBlock_t rtos_tasks[MAX_TASKS];
 /**
  * Create a new task given the specified function and priority
  *
- * @param tcb   The task control block of the created task
- * @param func  The function that the task executes
- * @param arg   The argument to pass to the function
- * @param priority The priority of the task. If NULL, default priority = RTOS_PRIORITY_NORMAL
+ * @param func      The function that the task executes
+ * @param arg       The argument to pass to the function
+ * @param priority  The priority of the task. If NULL, default priority = RTOS_PRIORITY_NORMAL
+ * @param task      A handle to the created task
  *
  * @return  - RTOS_OK on success
  *          - RTOS_ERROR_RESOURCE if no more tasks can be created
  *          - RTOS_ERROR_PARAMETER if the function pointer is NULL
  */
-rtosStatus_t rtosTaskNew(rtosTaskControlBlock_t** tcb, rtosTaskFunc_t func, void* arg, rtosPriority_t priority) {
+rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority, rtosTaskHandle_t* task) {
   static uint32_t next_id = 0;
 
   if (next_id >= MAX_TASKS) {
-    *tcb = NULL;
+    *task = NULL;
     return RTOS_ERROR_RESOURCE;
   }
 
   if (func == NULL) {
-    *tcb = NULL;
+    *task = NULL;
     return RTOS_ERROR_PARAMETER;
   }
 
@@ -40,7 +40,7 @@ rtosStatus_t rtosTaskNew(rtosTaskControlBlock_t** tcb, rtosTaskFunc_t func, void
     priority = RTOS_PRIORITY_NORMAL;
   }
 
-  rtosTaskControlBlock_t* tcb_ref = &rtos_tasks[next_id];
+  rtosTaskHandle_t tcb_ref = &rtos_tasks[next_id];
 
   // Initialize the TCB
   tcb_ref->id            = next_id;
@@ -71,8 +71,8 @@ rtosStatus_t rtosTaskNew(rtosTaskControlBlock_t** tcb, rtosTaskFunc_t func, void
 
   next_id++;
 
-  if (tcb != NULL) {
-    *tcb = tcb_ref;
+  if (task != NULL) {
+    *task = tcb_ref;
   }
   return RTOS_OK;
 }
