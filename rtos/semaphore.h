@@ -21,9 +21,11 @@ typedef struct {
 } rtosSemaphoreAttr_t;
 
 /// Semaphore
-typedef enum {
-
-} rtosSemaphore_t;
+typedef struct semaphore
+{
+  uint32_t max;
+  unit32_t count;
+} rtosSemaphore_t;;
 
 rtosSemaphore_t* osSemaphoreNew(uint32_t max, uint32_t init, const rtosSemaphoreAttr_t* attrs);
 rtosStatus_t     osSemaphoreDelete(rtosSemaphore_t* id);
