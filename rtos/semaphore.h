@@ -10,7 +10,6 @@
 
 #include "status.h"
 
-
 // Define semaphore attribute options
 #define rtosSemaphoreSomething 0x00000000U
 
@@ -21,13 +20,13 @@ typedef struct {
 } rtosSemaphoreAttr_t;
 
 /// Semaphore
-typedef enum {
+typedef struct {
 
 } rtosSemaphore_t;
 
-rtosSemaphore_t* osSemaphoreNew(uint32_t max, uint32_t init, const rtosSemaphoreAttr_t* attrs);
-rtosStatus_t     osSemaphoreDelete(rtosSemaphore_t* id);
-rtosStatus_t     osSemaphoreAcquire(rtosSemaphore_t* id, uint32_t timeout);
-rtosStatus_t     osSemaphoreRelease(rtosSemaphore_t* id);
+rtosStatus_t osSemaphoreNew(rtosSemaphore_t** semaphore, uint32_t max, uint32_t init, const rtosSemaphoreAttr_t* attrs);
+rtosStatus_t osSemaphoreDelete(const rtosSemaphore_t* semaphore);
+rtosStatus_t osSemaphoreAcquire(const rtosSemaphore_t* semaphore, uint32_t timeout);
+rtosStatus_t osSemaphoreRelease(const rtosSemaphore_t* semaphore);
 
 #endif  // __RTOS_SEMAPHORE_H
