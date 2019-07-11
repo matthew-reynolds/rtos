@@ -10,6 +10,8 @@
 
 #include "status.h"
 
+#define MAX_MUTEXES 10
+
 // Define mutex attribute options
 #define osMutexRecursive 0x00000001U
 #define osMutexPrioInherit 0x00000002U
@@ -26,9 +28,11 @@ typedef struct {
 
 } rtosMutex_t;
 
-rtosStatus_t rtosMutexNew(rtosMutex_t** mutex, const rtosMutexAttr_t* attrs);
-rtosStatus_t rtosMutexDelete(const rtosMutex_t* mutex);
-rtosStatus_t rtosMutexAcquire(const rtosMutex_t* mutex, uint32_t timeout);
-rtosStatus_t rtosMutexRelease(const rtosMutex_t* mutex);
+typedef rtosMutex_t* rtosMutexHandle_t;
+
+rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t* mutex);
+rtosStatus_t rtosMutexDelete(const rtosMutexHandle_t mutex);
+rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout);
+rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex);
 
 #endif  // __RTOS_MUTEX_H

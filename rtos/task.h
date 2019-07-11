@@ -55,6 +55,6 @@ typedef rtosTaskControlBlock_t* rtosTaskHandle_t;
 typedef void (*rtosTaskFunc_t)(void* args);
 
 rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority, rtosTaskHandle_t* task);
-rtosStatus_t rtosTaskDelete(rtosTaskHandle_t task);
+rtosStatus_t rtosTaskDelete(const rtosTaskHandle_t task);
 
 #endif  // __RTOS_TASK_H
