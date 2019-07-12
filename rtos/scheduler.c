@@ -114,6 +114,22 @@ void rtosPerformContextSwitch(void) {
 }
 
 /**
+ * Pass control to the next ready task
+ *
+ * If there is a ready task with the same priority as the running task, pass control. This is analogous to forcing the
+ * scheduler timeslice to expire immediately. If there is no ready task with the same priority, the current task
+ * continues execution and no context switch occurs.
+ */
+rtosStatus_t rtosYield(void) {
+  if (rtosGetReadyTask(rtos_running_task->priority) != NULL) {
+    rtos_running_task->state = RTOS_TASK_READY;
+    rtosInsertTaskListTail(rtosGetReadyTaskQueue(rtos_running_task->priority), rtos_running_task);
+    rtosInvokeScheduler();
+  }
+  return RTOS_OK;
+}
+
+/**
  * Block the current task for the specified number of ticks
  *
  * @param ticks the number of systicks to delay
