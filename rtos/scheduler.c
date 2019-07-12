@@ -67,8 +67,7 @@ void rtosInvokeScheduler(void) {
     rtosTaskHandle_t unblocked_task = rtos_delayed_tasks;
     rtos_delayed_tasks              = rtos_delayed_tasks->next;
 
-    unblocked_task->next                                            = rtosGetReadyTask(unblocked_task->priority);
-    rtos_ready_tasks[unblocked_task->priority - RTOS_PRIORITY_IDLE] = unblocked_task;
+    rtosInsertTaskListHead(&rtos_ready_tasks[unblocked_task->priority - RTOS_PRIORITY_IDLE], unblocked_task);
   }
 
   rtosPriority_t highest_ready_priority = rtosGetHighestReadyPriority();
@@ -82,16 +81,8 @@ void rtosInvokeScheduler(void) {
     // If the current task is being preempted, append the current task to the end of the appropriate ready queue
     // TODO: Should this block be in rtosInvokeScheduler or in rtosPerformContextSwitch?
     if (rtos_running_task->state == RTOS_TASK_RUNNING) {
-      rtos_running_task->state   = RTOS_TASK_READY;
-      rtosTaskHandle_t last_task = rtosGetReadyTask(rtos_running_task->priority);
-      if (last_task == NULL) {
-        rtos_ready_tasks[rtos_running_task->priority - RTOS_PRIORITY_IDLE] = rtos_running_task;
-      } else {
-        while (last_task->next != NULL) {
-          last_task = last_task->next;
-        }
-        last_task->next = rtos_running_task;
-      }
+      rtos_running_task->state = RTOS_TASK_READY;
+      rtosInsertTaskListTail(&rtos_ready_tasks[rtos_running_task->priority - RTOS_PRIORITY_IDLE], rtos_running_task);
     }
 
     // Determine the next task to run, and invoke the PendSV exception to perform the context switch
@@ -148,8 +139,7 @@ rtosStatus_t rtosDelayUntil(uint32_t ticks) {
 
       // Insert at front
       if (rtos_delayed_tasks->wake_time_ticks >= ticks) {
-        rtos_running_task->next = rtos_delayed_tasks;
-        rtos_delayed_tasks      = rtos_running_task;
+        rtosInsertTaskListHead(&rtos_delayed_tasks, rtos_running_task);
       }
 
       // Insert elsewhere
@@ -159,8 +149,7 @@ rtosStatus_t rtosDelayUntil(uint32_t ticks) {
         while (cur_task->next != NULL && cur_task->next->wake_time_ticks < ticks) {
           cur_task = cur_task->next;
         }
-        rtos_running_task->next = cur_task->next;
-        cur_task->next          = rtos_running_task;
+        rtosInsertTaskListHead(&cur_task->next, rtos_running_task);
       }
     }
     // Overflow
@@ -168,8 +157,7 @@ rtosStatus_t rtosDelayUntil(uint32_t ticks) {
 
       // Insert at front
       if (rtos_delayed_tasks->wake_time_ticks < const_rtos_ticks && rtos_delayed_tasks->wake_time_ticks >= ticks) {
-        rtos_running_task->next = rtos_delayed_tasks;
-        rtos_delayed_tasks      = rtos_running_task;
+        rtosInsertTaskListHead(&rtos_delayed_tasks, rtos_running_task);
       }
 
       // Insert elsewhere
@@ -187,8 +175,8 @@ rtosStatus_t rtosDelayUntil(uint32_t ticks) {
         while (cur_task->next != NULL && cur_task->next->wake_time_ticks < ticks) {
           cur_task = cur_task->next;
         }
-        rtos_running_task->next = cur_task->next;
-        cur_task->next          = rtos_running_task;
+
+        rtosInsertTaskListHead(&cur_task->next, rtos_running_task);
       }
     }
   }

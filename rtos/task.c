@@ -11,6 +11,7 @@
 
 rtosTaskControlBlock_t rtos_tasks[MAX_TASKS];
 
+
 /**
  * Create a new task given the specified function and priority
  *
@@ -75,4 +76,29 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
     *task = tcb_ref;
   }
   return RTOS_OK;
+}
+
+
+/**
+ * Insert the specified task to the head of the specified singly-linked list
+ */
+void rtosInsertTaskListHead(rtosTaskHandle_t* list, rtosTaskHandle_t task) {
+  task->next = *list;
+  *list      = task;
+}
+
+/**
+ * Insert the specified task to the tail of the specified singly-linked list
+ */
+void rtosInsertTaskListTail(rtosTaskHandle_t* list, rtosTaskHandle_t task) {
+  if (*list == NULL) {
+    *list = task;
+  } else {
+
+    rtosTaskHandle_t cur = *list;
+    while (cur->next != NULL) {
+      cur = cur->next;
+    }
+    cur->next = task;
+  }
 }

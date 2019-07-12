@@ -84,8 +84,7 @@ void rtosBegin(void) {
     rtosTaskHandle_t tcb = rtos_inactive_tasks;
     rtos_inactive_tasks  = tcb->next;
 
-    tcb->next                                            = rtosGetReadyTask(tcb->priority);
-    rtos_ready_tasks[tcb->priority - RTOS_PRIORITY_IDLE] = tcb;
+    rtosInsertTaskListHead(&rtos_ready_tasks[tcb->priority - RTOS_PRIORITY_IDLE], tcb);
   }
 
   // Prepare the first task
