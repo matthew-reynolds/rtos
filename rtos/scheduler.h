@@ -17,4 +17,7 @@ rtosTaskHandle_t rtosGetReadyTask(rtosPriority_t priority);
 void rtosInvokeScheduler(void);
 void rtosPerformContextSwitch(void);
 
+rtosStatus_t rtosDelay(uint32_t ticks);
+rtosStatus_t rtosDelayUntil(uint32_t ticks);
+
 #endif  // __RTOS_SCHEDULER_H

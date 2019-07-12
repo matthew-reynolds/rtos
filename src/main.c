@@ -10,9 +10,7 @@ void task1(void* arg) {
   uint32_t task_id = (uint32_t) arg;
 
   while (true) {
-    unsigned i = 1;
-    while (i < 1000)
-      i++;
+    rtosDelay(task_id * 100);
   }
 }
 

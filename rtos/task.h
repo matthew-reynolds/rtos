@@ -46,6 +46,7 @@ typedef struct rtosTaskControlBlock_tag {
   rtosPriority_t                   priority;
   rtosTaskState_t                  state;
   uint32_t                         stack_pointer;
+  uint32_t                         wake_time_ticks;
   struct rtosTaskControlBlock_tag* next;
 } rtosTaskControlBlock_t;
 

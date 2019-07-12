@@ -20,6 +20,7 @@ extern rtosTaskControlBlock_t rtos_tasks[MAX_TASKS];                  // Defined
 extern rtosTaskHandle_t       rtos_inactive_tasks;                    // Defined in scheduler.c
 extern rtosTaskHandle_t       rtos_ready_tasks[RTOS_PRIORITY_COUNT];  // Defined in scheduler.c
 extern rtosTaskHandle_t       rtos_running_task;                      // Defined in scheduler.c
+extern rtosTaskHandle_t       rtos_delayed_tasks;                     // Defined in scheduler.c
 extern rtosTaskHandle_t       rtos_blocked_tasks;                     // Defined in scheduler.c
 extern rtosTaskHandle_t       rtos_terminated_tasks;                  // Defined in scheduler.c
 
