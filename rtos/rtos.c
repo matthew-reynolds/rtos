@@ -84,7 +84,7 @@ void rtosBegin(void) {
     rtosTaskHandle_t tcb = rtos_inactive_tasks;
     rtos_inactive_tasks  = tcb->next;
 
-    rtosInsertTaskListHead(&rtos_ready_tasks[tcb->priority - RTOS_PRIORITY_IDLE], tcb);
+    rtosInsertTaskListHead(rtosGetReadyTaskQueue(tcb->priority), tcb);
   }
 
   // Prepare the first task
@@ -92,9 +92,9 @@ void rtosBegin(void) {
   if (rtos_running_task == NULL) {
     return;
   }
-  rtos_ready_tasks[rtos_running_task->priority - RTOS_PRIORITY_IDLE] = rtos_running_task->next;
-  rtos_running_task->state                                           = RTOS_TASK_RUNNING;
-  rtos_running_task->next                                            = NULL;
+  rtosSetReadyTask(rtos_running_task->priority, rtos_running_task->next);
+  rtos_running_task->state = RTOS_TASK_RUNNING;
+  rtos_running_task->next  = NULL;
 
   // Set the PSP to the MSP
   // This is temporary (PSP will be overwritten once the task starts) and useless (The stack is not used between
