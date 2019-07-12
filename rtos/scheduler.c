@@ -60,19 +60,6 @@ rtosTaskHandle_t rtosGetReadyTask(rtosPriority_t priority) {
 };
 
 /**
- * Set the ready task with the specified priority to the specified task handle
- */
-rtosStatus_t rtosSetReadyTask(rtosPriority_t priority, rtosTaskHandle_t task) {
-  rtosTaskHandle_t* queue = rtosGetReadyTaskQueue(priority);
-  if (queue == NULL) {
-    return RTOS_ERROR_PARAMETER;
-  }
-
-  *queue = task;
-  return RTOS_OK;
-};
-
-/**
  * Invoke the scheduler
  *
  * Perform a context switch to the next ready highest priority task by triggering the PendSV exception if:
@@ -85,9 +72,7 @@ void rtosInvokeScheduler(void) {
 
   // Unblock any delayed tasks whose delay has expired
   while (rtos_delayed_tasks != NULL && rtos_delayed_tasks->wake_time_ticks == rtos_ticks) {
-    rtosTaskHandle_t unblocked_task = rtos_delayed_tasks;
-    rtos_delayed_tasks              = rtos_delayed_tasks->next;
-
+    rtosTaskHandle_t unblocked_task = rtosPopTaskListHead(&rtos_delayed_tasks);
     rtosInsertTaskListHead(rtosGetReadyTaskQueue(unblocked_task->priority), unblocked_task);
   }
 
@@ -119,7 +104,7 @@ void rtosPerformContextSwitch(void) {
   rtos_running_task->stack_pointer = rtosStoreContext();
 
   // Set the running task to the new task
-  rtosSetReadyTask(_next_task->priority, _next_task->next);
+  rtosPopTaskListHead(rtosGetReadyTaskQueue(_next_task->priority));
   _next_task->next  = NULL;
   _next_task->state = RTOS_TASK_RUNNING;
   rtos_running_task = _next_task;

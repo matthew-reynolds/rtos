@@ -48,8 +48,7 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
   tcb_ref->priority      = priority;
   tcb_ref->state         = RTOS_TASK_INACTIVE;
   tcb_ref->stack_pointer = BASE_STACK_PTR - MAIN_STACK_SIZE - TASK_STACK_SIZE * tcb_ref->id;
-  tcb_ref->next          = rtos_inactive_tasks;
-  rtos_inactive_tasks    = tcb_ref;
+  rtosInsertTaskListHead(&rtos_inactive_tasks, tcb_ref);
 
   // Initialize stack. Set all unspecified registers to 0. (Note: This is unnecessary)
   *(uint32_t*) (tcb_ref->stack_pointer - 0x40) = 0x00000000;       // R4
@@ -78,6 +77,14 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
   return RTOS_OK;
 }
 
+/**
+ * Insert the head of the specified singly-linked list
+ */
+rtosTaskHandle_t rtosPopTaskListHead(rtosTaskHandle_t* list) {
+  rtosTaskHandle_t task = *list;
+  *list                 = (*list)->next;
+  return task;
+}
 
 /**
  * Insert the specified task to the head of the specified singly-linked list

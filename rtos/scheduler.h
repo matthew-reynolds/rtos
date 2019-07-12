@@ -14,7 +14,6 @@
 rtosPriority_t    rtosGetHighestReadyPriority(void);
 rtosTaskHandle_t* rtosGetReadyTaskQueue(rtosPriority_t priority);
 rtosTaskHandle_t  rtosGetReadyTask(rtosPriority_t priority);
-rtosStatus_t      rtosSetReadyTask(rtosPriority_t priority, rtosTaskHandle_t task);
 
 void rtosInvokeScheduler(void);
 void rtosPerformContextSwitch(void);

@@ -81,9 +81,7 @@ void rtosBegin(void) {
 
   // Add all inactive tasks to the ready list
   while (rtos_inactive_tasks != NULL) {
-    rtosTaskHandle_t tcb = rtos_inactive_tasks;
-    rtos_inactive_tasks  = tcb->next;
-
+    rtosTaskHandle_t tcb = rtosPopTaskListHead(&rtos_inactive_tasks);
     rtosInsertTaskListHead(rtosGetReadyTaskQueue(tcb->priority), tcb);
   }
 
@@ -92,7 +90,7 @@ void rtosBegin(void) {
   if (rtos_running_task == NULL) {
     return;
   }
-  rtosSetReadyTask(rtos_running_task->priority, rtos_running_task->next);
+  rtosPopTaskListHead(rtosGetReadyTaskQueue(rtos_running_task->priority));
   rtos_running_task->state = RTOS_TASK_RUNNING;
   rtos_running_task->next  = NULL;
 
