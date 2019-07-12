@@ -17,8 +17,6 @@ rtosTaskHandle_t rtos_delayed_tasks                    = NULL;  // Stored in ord
 rtosTaskHandle_t rtos_blocked_tasks                    = NULL;
 rtosTaskHandle_t rtos_terminated_tasks                 = NULL;
 
-rtosTaskHandle_t _next_task = NULL;
-
 /**
  * Get the priority of the highest-priority non-empty queue of ready tasks.
  *
@@ -91,8 +89,7 @@ void rtosInvokeScheduler(void) {
       rtosInsertTaskListTail(rtosGetReadyTaskQueue(rtos_running_task->priority), rtos_running_task);
     }
 
-    // Determine the next task to run, and invoke the PendSV exception to perform the context switch
-    _next_task = rtosGetReadyTask(highest_ready_priority);
+    // Invoke the PendSV exception to perform the context switch
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
   }
 }
@@ -103,12 +100,9 @@ void rtosInvokeScheduler(void) {
 void rtosPerformContextSwitch(void) {
   rtos_running_task->stack_pointer = rtosStoreContext();
 
-  // Set the running task to the new task
-  rtosPopTaskListHead(rtosGetReadyTaskQueue(_next_task->priority));
-  _next_task->next  = NULL;
-  _next_task->state = RTOS_TASK_RUNNING;
-  rtos_running_task = _next_task;
-  _next_task        = NULL;
+  // Set the running task to the next ready task
+  rtos_running_task        = rtosPopTaskListHead(rtosGetReadyTaskQueue(rtosGetHighestReadyPriority()));
+  rtos_running_task->state = RTOS_TASK_RUNNING;
 
   rtosRestoreContext(rtos_running_task->stack_pointer);
 }

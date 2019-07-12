@@ -92,7 +92,6 @@ void rtosBegin(void) {
   }
   rtosPopTaskListHead(rtosGetReadyTaskQueue(rtos_running_task->priority));
   rtos_running_task->state = RTOS_TASK_RUNNING;
-  rtos_running_task->next  = NULL;
 
   // Set the PSP to the MSP
   // This is temporary (PSP will be overwritten once the task starts) and useless (The stack is not used between

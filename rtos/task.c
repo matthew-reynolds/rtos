@@ -78,11 +78,12 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
 }
 
 /**
- * Insert the head of the specified singly-linked list
+ * Remove and return the head of the specified singly-linked list
  */
 rtosTaskHandle_t rtosPopTaskListHead(rtosTaskHandle_t* list) {
   rtosTaskHandle_t task = *list;
   *list                 = (*list)->next;
+  task->next = NULL;
   return task;
 }
 
