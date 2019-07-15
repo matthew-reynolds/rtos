@@ -8,12 +8,15 @@
 
 #include <stdint.h>
 
+#include <LPC17xx.h>
+
 #include "status.h"
 
-#define TOTAL_STACK_SIZE 0x8000  // TODO: Check dynamically? Can we pull from startup_LPC17xx.s?
-#define MAIN_STACK_SIZE 0x2000
-#define TASK_STACK_SIZE 0x1000
-#define MAX_TASKS 6
+#define BASE_STACK_PTR *(uint32_t*) (0x00 + SCB->VTOR)
+#define TOTAL_STACK_SIZE 0x2000
+#define MAIN_STACK_SIZE 0x800
+#define TASK_STACK_SIZE 0x400
+#define MAX_TASKS ((TOTAL_STACK_SIZE - MAIN_STACK_SIZE) / TASK_STACK_SIZE)
 
 /// Task priorities
 typedef enum {
@@ -43,15 +46,22 @@ typedef struct rtosTaskControlBlock_tag {
   rtosPriority_t                   priority;
   rtosTaskState_t                  state;
   uint32_t                         stack_pointer;
+  uint32_t                         wake_time_ticks;
   struct rtosTaskControlBlock_tag* next;
 } rtosTaskControlBlock_t;
+
+typedef rtosTaskControlBlock_t* rtosTaskHandle_t;
 
 // Function pointer
 typedef void (*rtosTaskFunc_t)(void* args);
 
-/**
- * Create a new task given the specified function and priority
- */
-uint32_t rtosTaskNew(rtosTaskFunc_t func, rtosPriority_t priority);
+void         rtosTaskInitAll(void);
+void         rtosTaskInit(uint32_t task_id);
+rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority, rtosTaskHandle_t* task);
+rtosStatus_t rtosTaskDelete(const rtosTaskHandle_t task);
+
+rtosTaskHandle_t rtosPopTaskListHead(rtosTaskHandle_t* list);
+void             rtosInsertTaskListHead(rtosTaskHandle_t* list, rtosTaskHandle_t task);
+void             rtosInsertTaskListTail(rtosTaskHandle_t* list, rtosTaskHandle_t task);
 
 #endif  // __RTOS_TASK_H

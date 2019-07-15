@@ -1,3 +1,9 @@
+/**
+ * Semaphore implementation
+ * @author Matt Reynolds
+ * @author Dawson Hemphill
+ */
+
 #include "semaphore.h"
 
 
@@ -19,3 +25,11 @@ rtosStatus_t     osSemaphoreAcquire(rtosSemaphore_t* id, uint32_t timeout){
 rtosStatus_t     osSemaphoreRelease(rtosSemaphore_t* id){
     
 }
+=======
+/**
+ * Semaphore implementation
+ * @author Matt Reynolds
+ * @author Dawson Hemphill
+ */
+
+#include "semaphore.h"
