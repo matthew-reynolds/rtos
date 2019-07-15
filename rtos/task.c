@@ -11,6 +11,34 @@
 
 rtosTaskControlBlock_t rtos_tasks[MAX_TASKS];
 
+/**
+ * Initialize all task control blocks
+ */
+void rtosTaskInitAll(void) {
+  for (uint32_t task_id = 0; task_id < MAX_TASKS; task_id++) {
+    rtosTaskInit(task_id);
+  }
+}
+
+/**
+ * Initialize the task control block
+ *
+ * Sets the task ID and adds the task to the inactive list.
+ */
+void rtosTaskInit(uint32_t task_id) {
+  rtosTaskHandle_t tcb_ref = &rtos_tasks[task_id];
+
+  // Initialize the TCB
+  tcb_ref->id              = task_id;
+  tcb_ref->next            = NULL;
+  tcb_ref->priority        = RTOS_PRIORITY_NONE;
+  tcb_ref->state           = RTOS_TASK_INACTIVE;
+  tcb_ref->stack_pointer   = BASE_STACK_PTR - MAIN_STACK_SIZE - TASK_STACK_SIZE * tcb_ref->id;
+  tcb_ref->wake_time_ticks = 0;
+
+  // Add the task to the inactive list
+  rtosInsertTaskListHead(&rtos_inactive_tasks, tcb_ref);
+}
 
 /**
  * Create a new task given the specified function and priority
@@ -25,9 +53,8 @@ rtosTaskControlBlock_t rtos_tasks[MAX_TASKS];
  *          - RTOS_ERROR_PARAMETER if the function pointer is NULL
  */
 rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority, rtosTaskHandle_t* task) {
-  static uint32_t next_id = 0;
 
-  if (next_id >= MAX_TASKS) {
+  if (rtos_inactive_tasks == NULL) {
     *task = NULL;
     return RTOS_ERROR_RESOURCE;
   }
@@ -41,14 +68,14 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
     priority = RTOS_PRIORITY_NORMAL;
   }
 
-  rtosTaskHandle_t tcb_ref = &rtos_tasks[next_id];
+  rtosTaskHandle_t tcb_ref = rtosPopTaskListHead(&rtos_inactive_tasks);
 
-  // Initialize the TCB
-  tcb_ref->id            = next_id;
+  // Setup the tcb and add the task to the ready queue
+  tcb_ref->next          = NULL;
   tcb_ref->priority      = priority;
-  tcb_ref->state         = RTOS_TASK_INACTIVE;
+  tcb_ref->state         = RTOS_TASK_READY;
   tcb_ref->stack_pointer = BASE_STACK_PTR - MAIN_STACK_SIZE - TASK_STACK_SIZE * tcb_ref->id;
-  rtosInsertTaskListHead(&rtos_inactive_tasks, tcb_ref);
+  rtosInsertTaskListHead(rtosGetReadyTaskQueue(priority), tcb_ref);
 
   // Initialize stack. Set all unspecified registers to 0. (Note: This is unnecessary)
   *(uint32_t*) (tcb_ref->stack_pointer - 0x40) = 0x00000000;       // R4
@@ -69,8 +96,6 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
   *(uint32_t*) (tcb_ref->stack_pointer - 0x04) = 0x01000000;       // PSR
   tcb_ref->stack_pointer -= 0x40;
 
-  next_id++;
-
   if (task != NULL) {
     *task = tcb_ref;
   }
@@ -83,7 +108,7 @@ rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority
 rtosTaskHandle_t rtosPopTaskListHead(rtosTaskHandle_t* list) {
   rtosTaskHandle_t task = *list;
   *list                 = (*list)->next;
-  task->next = NULL;
+  task->next            = NULL;
   return task;
 }
 
