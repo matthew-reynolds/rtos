@@ -7,8 +7,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "globals.h"
 #include "rtos.h"
 #include "semaphore.h"
+
+rtosSemaphoreHandle_t rtos_semaphores = NULL;
 
 /**
  * Create a new semaphore
@@ -37,6 +40,10 @@ rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
   semaphore->max     = max;
   semaphore->blocked = NULL;
 
+  // Add the semaphore to the global list of semaphores
+  semaphore->next = rtos_semaphores;
+  rtos_semaphores = semaphore;
+
   return RTOS_OK;
 }
 
@@ -51,6 +58,21 @@ rtosStatus_t rtosSemaphoreDelete(rtosSemaphoreHandle_t semaphore) {
   // Ensure the semaphore handle is valid
   if (semaphore == NULL) {
     return RTOS_ERROR_PARAMETER;
+  }
+
+  // Remove the semaphore from the global list of semaphores
+  rtosSemaphoreHandle_t prev_sem = NULL;
+  rtosSemaphoreHandle_t cur_sem  = rtos_semaphores;
+  while (cur_sem != NULL) {
+    if (cur_sem == semaphore) {
+      if (prev_sem == NULL) {
+        rtos_semaphores = cur_sem->next;
+      } else {
+        prev_sem->next = cur_sem->next;
+      }
+      break;
+    }
+    cur_sem = cur_sem->next;
   }
 
   // Unblock all blocked tasks
@@ -103,8 +125,8 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
 
     // If the semaphore is unavailable, block the current task
     if (semaphore->count == 0) {
-      rtosInsertTaskListTail(&semaphore->blocked, rtos_running_task);
       rtos_running_task->state = RTOS_TASK_BLOCKED;
+      rtosInsertTaskListTail(&semaphore->blocked, rtos_running_task);
 
       __enable_irq();
       rtosInvokeScheduler();
@@ -128,14 +150,19 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
   // Timeout value is a given number of ticks, will do it once and check if desired time has been reached
   else {
 
-    uint32_t start_ticks = rtosGetSysTickCount();
+    // If the semaphore is unavailable, block the current task
+    if (semaphore->count == 0) {
+      rtos_running_task->state           = RTOS_TASK_BLOCKED_TIMEOUT;
+      rtos_running_task->wake_time_ticks = rtosGetSysTickCount() + timeout;
+      rtosInsertTaskListTail(&semaphore->blocked, rtos_running_task);
 
-    while ((rtosGetSysTickCount() - start_ticks) < timeout && semaphore->count == 0) {
-      // TODO: Set the task to blocked
       __enable_irq();
+      rtosInvokeScheduler();
       __disable_irq();
     }
 
+    // TODO: Detect if the task was unblocked due to the semaphore becoming available or due to the semaphore being
+    // deleted
     if (semaphore->count == 0) {
       __enable_irq();
       return RTOS_ERROR_TIMEOUT;
@@ -175,6 +202,7 @@ rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
   // If there are blocked tasks, unblock the first task
   if (semaphore->blocked != NULL) {
     rtosTaskHandle_t unblocked = rtosPopTaskListHead(&semaphore->blocked);
+    unblocked->state           = RTOS_TASK_READY;
     rtosInsertTaskListTail(rtosGetReadyTaskQueue(unblocked->priority), unblocked);
 
     __enable_irq();

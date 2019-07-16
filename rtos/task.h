@@ -37,6 +37,7 @@ typedef enum {
   RTOS_TASK_READY,
   RTOS_TASK_RUNNING,
   RTOS_TASK_BLOCKED,
+  RTOS_TASK_BLOCKED_TIMEOUT,
   RTOS_TASK_TERMINATED,
 } rtosTaskState_t;
 
@@ -55,8 +56,10 @@ typedef rtosTaskControlBlock_t* rtosTaskHandle_t;
 // Function pointer
 typedef void (*rtosTaskFunc_t)(void* args);
 
-void         rtosTaskInitAll(void);
-void         rtosTaskInit(uint32_t task_id);
+void rtosTaskInitAll(void);
+void rtosTaskInit(uint32_t task_id);
+void rtosTaskExit(void);
+
 rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority, rtosTaskHandle_t* task);
 rtosStatus_t rtosTaskDelete(rtosTaskHandle_t task);
 

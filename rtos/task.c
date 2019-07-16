@@ -41,6 +41,20 @@ void rtosTaskInit(uint32_t task_id) {
 }
 
 /**
+ * Terminate the current task
+ *
+ * Terminates execution of the task and adds the task's control block back to the pool of available tasks.
+ * Note that terminated tasks and inactive tasks are treated the same way in this RTOS.
+ *
+ * Analagous to a return statement at the end of the task function body.
+ */
+void rtosTaskExit(void) {
+  rtos_running_task->state = RTOS_TASK_TERMINATED;
+  rtosInsertTaskListTail(&rtos_inactive_tasks, rtos_running_task);
+  rtosInvokeScheduler();
+}
+
+/**
  * Create a new task given the specified function and priority
  *
  * @param func      The function that the task executes
