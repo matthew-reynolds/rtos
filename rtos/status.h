@@ -14,8 +14,6 @@ typedef enum {
   RTOS_ERROR_TIMEOUT,
   RTOS_ERROR_RESOURCE,
   RTOS_ERROR_PARAMETER,
-  RTOS_ERROR_NO_MEMORY,
-  RTOS_ERROR_ISR,
 } rtosStatus_t;
 
 #endif  // __RTOS_STATUS_H
