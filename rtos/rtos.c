@@ -82,7 +82,6 @@ void rtosSetSysTickFreq(uint32_t freq) {
   SysTick_Config(SystemCoreClock / systick_freq);
 }
 
-
 /**
  * Initialize the RTOS
  */
