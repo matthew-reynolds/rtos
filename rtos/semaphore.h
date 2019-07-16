@@ -9,8 +9,6 @@
 #include "status.h"
 #include <stdint.h>
 
-#define MAX_SEMAPHORES 10
-
 // Define semaphore attribute options
 #define rtosSemaphoreSomething 0x00000000U
 
@@ -33,7 +31,7 @@ typedef rtosSemaphore_t* rtosSemaphoreHandle_t;
 rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               uint32_t                   init,
                               const rtosSemaphoreAttr_t* attrs,
-                              rtosSemaphoreHandle_t*     semaphore);
+                              rtosSemaphoreHandle_t      semaphore);
 rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore);
 rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_t timeout);
 rtosStatus_t rtosSemaphoreRelease(const rtosSemaphoreHandle_t semaphore);

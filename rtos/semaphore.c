@@ -15,23 +15,21 @@ uint32_t sem_count = 0;
 rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               uint32_t                   init,
                               const rtosSemaphoreAttr_t* attrs,
-                              rtosSemaphoreHandle_t*     semaphore) {
+                              rtosSemaphoreHandle_t      semaphore) {
 
-  if (sem_count < MAX_SEMAPHORES) {
-    const char*      name = attrs->name;
-    rtosSemaphore_t* sem  = malloc(sizeof(rtosSemaphore_t));
-    sem->name             = name;
-    sem->count            = init;
-    sem->max              = max;
-    sem_count++;
-    return RTOS_OK;
-  } else {
-    return RTOS_ERROR;
+  if (semaphore == NULL) {
+    return RTOS_ERROR_PARAMETER;
   }
+
+  // Initialize the semaphore struct fields
+  semaphore->name  = attrs->name;
+  semaphore->count = init;
+  semaphore->max   = max;
+
+  return RTOS_OK;
 }
 
 rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore) {
-  free(semaphore);
   return RTOS_OK;
 }
 
