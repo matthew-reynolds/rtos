@@ -18,11 +18,12 @@ typedef struct {
 } rtosSemaphoreAttr_t;
 
 /// Semaphore
-typedef struct semaphore {
+typedef struct rtosSemaphore_tag {
   const char*      name;
   uint32_t         count;
   uint32_t         max;
   rtosTaskHandle_t blocked;
+  struct rtosSemaphore_tag* next;
 } rtosSemaphore_t;
 
 typedef rtosSemaphore_t* rtosSemaphoreHandle_t;
