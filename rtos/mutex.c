@@ -206,6 +206,7 @@ rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
 
   // Ensure the mutex is acquired and that the releasing thread
   if (mutex->count == 1 || rtos_running_task != mutex->acquired) {
+    __enable_irq();
     return RTOS_ERROR_RESOURCE;
   }
 
@@ -229,6 +230,5 @@ rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
   }
 
   __enable_irq();
-
   return RTOS_OK;
 }

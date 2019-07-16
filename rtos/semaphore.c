@@ -194,6 +194,7 @@ rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
 
   // Ensure the maximum value has not been reached
   if (semaphore->count == semaphore->max) {
+    __enable_irq();
     return RTOS_ERROR_RESOURCE;
   }
 
