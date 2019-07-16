@@ -120,7 +120,7 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
     return RTOS_OK;
   }
 
-  // Timeout value is set to wait forever so loop until it is ready
+  // Timeout value is set to forever so block until the semaphore is available
   else if (timeout == RTOS_WAIT_FOREVER) {
 
     // If the semaphore is unavailable, block the current task
@@ -147,7 +147,7 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
 
   }
 
-  // Timeout value is a given number of ticks, will do it once and check if desired time has been reached
+  // Timeout value is a given number of ticks, block until the semaphore is available or the timeout expires
   else {
 
     // If the semaphore is unavailable, block the current task
