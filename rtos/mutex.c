@@ -57,6 +57,21 @@ rtosStatus_t rtosMutexDelete(const rtosMutexHandle_t mutex) {
     return RTOS_ERROR_PARAMETER;
   }
 
+  // Remove the mutex from the global list of mutexes
+  rtosMutexHandle_t prev_mutex = NULL;
+  rtosMutexHandle_t cur_mutex  = rtos_mutexes;
+  while (cur_mutex != NULL) {
+    if (cur_mutex == mutex) {
+      if (prev_mutex == NULL) {
+        rtos_mutexes = cur_mutex->next;
+      } else {
+        prev_mutex->next = cur_mutex->next;
+      }
+      break;
+    }
+    cur_mutex = cur_mutex->next;
+  }
+
   // Unblock all blocked tasks
   // NOTE: Tasks unblocked via mutex deletion return a unique error since the mutex never became available
   __disable_irq();
