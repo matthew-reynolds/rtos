@@ -7,8 +7,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "mutex.h"
 #include "globals.h"
+#include "mutex.h"
+#include "rtos.h"
 
 rtosMutexHandle_t rtos_mutexes = NULL;
 
@@ -29,14 +30,15 @@ rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t mutex)
   }
 
   // Initialize the mutex struct fields
-  mutex->attrs.name  = attrs->name;
+  mutex->attrs.name      = attrs->name;
   mutex->attrs.attr_bits = attrs->attr_bits;
-  mutex->count   = 1;
-  mutex->acquired = NULL;
-  mutex->blocked = NULL;
-  mutex->initPriority = rtos_running_task->priority;
+  mutex->count           = 1;
+  mutex->acquired        = NULL;
+  mutex->blocked         = NULL;
+  mutex->initPriority    = RTOS_PRIORITY_NONE;
 
-  mutex->next = rtos_mutexes;
+  // Add the mutex to the global list of mutex
+  mutex->next  = rtos_mutexes;
   rtos_mutexes = mutex;
 
   return RTOS_OK;
@@ -70,7 +72,7 @@ rtosStatus_t rtosMutexDelete(const rtosMutexHandle_t mutex) {
 }
 
 /**
- * Attempt to acquire (decrement) the specified mutex
+ * Attempt to acquire the specified mutex
  *
  * @return  - RTOS_OK               on success
  *          - RTOS_ERROR            if the mutex was deleted while trying to acquire it
@@ -80,7 +82,7 @@ rtosStatus_t rtosMutexDelete(const rtosMutexHandle_t mutex) {
  */
 rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
 
-// Ensure the mutex handle is valid
+  // Ensure the mutex handle is valid
   if (mutex == NULL) {
     return RTOS_ERROR_PARAMETER;
   }
@@ -109,7 +111,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       rtos_running_task->state = RTOS_TASK_BLOCKED;
 
       if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
-          mutex->acquired->priority = rtos_running_task->priority;
+        mutex->acquired->priority = rtos_running_task->priority;
       }
 
       __enable_irq();
@@ -142,7 +144,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
 
       if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
-          mutex->acquired->priority = rtos_running_task->priority;
+        mutex->acquired->priority = rtos_running_task->priority;
       }
 
       __enable_irq();
@@ -165,7 +167,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
 }
 
 /**
- * Release (increment) the specified mutex
+ * Release the specified mutex
  *
  * @return  - RTOS_OK               on success
  *          - RTOS_ERROR_PARAMETER  if the mutex is NULL or invalid
@@ -173,7 +175,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
  */
 rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
 
-// Ensure the mutex handle is valid
+  // Ensure the mutex handle is valid
   if (mutex == NULL) {
     return RTOS_ERROR_PARAMETER;
   }
@@ -194,7 +196,7 @@ rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
     rtosInsertTaskListTail(rtosGetReadyTaskQueue(unblocked->priority), unblocked);
 
     if (rtos_running_task->priority != mutex->initPriority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
-        rtos_running_task->priority = mutex->initPriority;
+      rtos_running_task->priority = mutex->initPriority;
     }
 
     __enable_irq();

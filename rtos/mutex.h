@@ -7,9 +7,9 @@
 #define __RTOS_MUTEX_H
 
 #include <stdint.h>
-#include "task.h"
 
 #include "status.h"
+#include "task.h"
 
 // Define mutex attribute options
 #define RTOS_MUTEX_PRIO_INHERIT 0x00000002U
@@ -22,12 +22,12 @@ typedef struct {
 } rtosMutexAttr_t;
 
 /// Mutex
-typedef struct rtosMutex_tag{
-  uint32_t         count;
-  rtosTaskHandle_t blocked;
-  rtosTaskHandle_t acquired;
-  rtosPriority_t initPriority;
-  rtosMutexAttr_t attrs;
+typedef struct rtosMutex_tag {
+  uint32_t              count;
+  rtosTaskHandle_t      blocked;
+  rtosTaskHandle_t      acquired;
+  rtosPriority_t        initPriority;
+  rtosMutexAttr_t       attrs;
   struct rtosMutex_tag* next;
 } rtosMutex_t;
 
