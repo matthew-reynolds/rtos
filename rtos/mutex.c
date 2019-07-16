@@ -10,7 +10,7 @@
 #include "mutex.h"
 #include "globals.h"
 
-uint32_t mutex_count = 0;
+rtosMutexHandle_t rtos_mutexes = NULL;
 
 /**
  * Create a new mutex
@@ -21,7 +21,7 @@ uint32_t mutex_count = 0;
  * @return  - RTOS_OK               on success
  *          - RTOS_ERROR_PARAMETER  if the mutex is NULL or invalid
  */
-rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t* mutex) {
+rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t mutex) {
     
   // Ensure the mutex handle is valid
   if (mutex == NULL) {
@@ -35,6 +35,9 @@ rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t* mutex
   mutex->acquired = NULL;
   mutex->blocked = NULL;
   mutex->initPriority = rtos_running_task->priority;
+
+  mutex->next = rtos_mutexes;
+  rtos_mutexes = mutex;
 
   return RTOS_OK;
 }
@@ -105,7 +108,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
       rtos_running_task->state = RTOS_TASK_BLOCKED;
 
-      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attrbits & rtosMutexPrioInherit) {
+      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & rtosMutexPrioInherit) {
           mutex->acquired->priority = rtos_running_task->priority;
       }
 
@@ -132,14 +135,23 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
   // Timeout value is a given number of ticks, will do it once and check if desired time has been reached
   else {
 
-    uint32_t start_ticks = rtosGetSysTickCount();
+    // If the semaphore is unavailable, block the current task
+    if (mutex->count == 0) {
+      rtos_running_task->state           = RTOS_TASK_BLOCKED_TIMEOUT;
+      rtos_running_task->wake_time_ticks = rtosGetSysTickCount() + timeout;
+      rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
 
-    while ((rtosGetSysTickCount() - start_ticks) < timeout && mutex->count == 0) {
-      // TODO: Set the task to blocked
+      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & rtosMutexPrioInherit) {
+          mutex->acquired->priority = rtos_running_task->priority;
+      }
+
       __enable_irq();
+      rtosInvokeScheduler();
       __disable_irq();
     }
 
+    // TODO: Detect if the task was unblocked due to the semaphore becoming available or due to the semaphore being
+    // deleted
     if (mutex->count == 0) {
       __enable_irq();
       return RTOS_ERROR_TIMEOUT;
@@ -157,6 +169,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
  *
  * @return  - RTOS_OK               on success
  *          - RTOS_ERROR_PARAMETER  if the mutex is NULL or invalid
+ *          - RTOS_ERROR_RESOURCE   if the mutex is already released or thread releasing did not acquire the mutex
  */
 rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
 
@@ -170,8 +183,7 @@ rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
   // Disable interrupts and then increment the count
   __disable_irq();
 
-  if (mutex->count == 1) {
-    
+  if (mutex->count == 1 | mutex->acquired != rtos_running_task) {
     return RTOS_ERROR_RESOURCE;
   }
   mutex->count++;

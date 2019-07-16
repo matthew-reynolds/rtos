@@ -22,17 +22,18 @@ typedef struct {
 } rtosMutexAttr_t;
 
 /// Mutex
-typedef struct {
+typedef struct rtosMutex_tag{
   uint32_t         count;
   rtosTaskHandle_t blocked;
   rtosTaskHandle_t acquired;
   rtosPriority_t initPriority;
   rtosMutexAttr_t attrs;
+  struct rtosMutex_tag* next;
 } rtosMutex_t;
 
 typedef rtosMutex_t* rtosMutexHandle_t;
 
-rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t* mutex);
+rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t mutex);
 rtosStatus_t rtosMutexDelete(rtosMutexHandle_t mutex);
 rtosStatus_t rtosMutexAcquire(rtosMutexHandle_t mutex, uint32_t timeout);
 rtosStatus_t rtosMutexRelease(rtosMutexHandle_t mutex);
