@@ -72,11 +72,12 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
     return RTOS_ERROR_PARAMETER;
   }
 
+  // Disable interrupts to ensure count is read and written atomically
   __disable_irq();
 
   // Timeout value is set to zero so try once and then exit
   if (timeout == 0) {
-    if (semaphore->count <= 0) {
+    if (semaphore->count == 0) {
       return RTOS_ERROR_RESOURCE;
     } else {
 
@@ -88,7 +89,7 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
 
   // Timeout value is set to wait forever so loop until it is ready
   else if (timeout == rtosWaitForever) {
-    while (semaphore->count <= 0) {
+    while (semaphore->count == 0) {
       // TODO: Set the task to blocked
       __enable_irq();
       __disable_irq();
@@ -105,13 +106,13 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
 
     uint32_t start_ticks = rtosGetSysTickCount();
 
-    while ((rtosGetSysTickCount() - start_ticks) < timeout && semaphore->count <= 0) {
+    while ((rtosGetSysTickCount() - start_ticks) < timeout && semaphore->count == 0) {
       // TODO: Set the task to blocked
       __enable_irq();
       __disable_irq();
     }
 
-    if (semaphore->count <= 0) {
+    if (semaphore->count == 0) {
       return RTOS_ERROR_TIMEOUT;
     } else {
       semaphore->count--;
@@ -133,7 +134,7 @@ rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
     return RTOS_ERROR_PARAMETER;
   }
 
-  // Disable the IRQ and then increment the count
+  // Disable interrupts and then increment the count
   __disable_irq();
   semaphore->count++;
   __enable_irq();
