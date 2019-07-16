@@ -111,6 +111,43 @@ void rtosInvokeScheduler(void) {
     sem = sem->next;
   }
 
+  // Iterate through each mutex
+  rtosMutexHandle_t mutex = rtos_mutexes;
+  while (mutex != NULL) {
+
+    // Iterate through each task blocked by the current semaphore
+    rtosTaskHandle_t prev_task = NULL;
+    rtosTaskHandle_t cur_task  = mutex->blocked;
+    while (cur_task != NULL) {
+
+      // If the task has a timeout set and the timeout expired, remove the task from the semaphore's blocked list
+      if (cur_task->state == RTOS_TASK_BLOCKED_TIMEOUT && cur_task->wake_time_ticks == rtos_ticks) {
+        if (prev_task == NULL) {
+          rtosPopTaskListHead(&mutex->blocked);
+        } else {
+          prev_task->next = cur_task->next;
+        }
+
+        // Re-add the task to the ready list
+        cur_task->state = RTOS_TASK_READY;
+        rtosInsertTaskListTail(rtosGetReadyTaskQueue(cur_task->priority), cur_task);
+
+        // Increment the current task
+        rtosTaskHandle_t next_task = cur_task->next;
+        cur_task->next             = NULL;
+        cur_task                   = next_task;
+      }
+
+      // Otherwise, skip this task
+      else {
+        prev_task = cur_task;
+        cur_task  = cur_task->next;
+      }
+    }
+
+    mutex = mutex->next;
+  }
+
   rtosPriority_t highest_ready_priority = rtosGetHighestReadyPriority();
 
   // Check if a context switch is required

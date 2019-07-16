@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "mutex.h"
+#include "rtos.h"
 #include "globals.h"
 
 rtosMutexHandle_t rtos_mutexes = NULL;
