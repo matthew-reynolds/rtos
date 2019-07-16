@@ -30,12 +30,12 @@ rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t mutex)
   }
 
   // Initialize the mutex struct fields
-  mutex->attrs.name      = attrs->name;
-  mutex->attrs.attr_bits = attrs->attr_bits;
-  mutex->count           = 1;
-  mutex->acquired        = NULL;
-  mutex->blocked         = NULL;
-  mutex->initPriority    = RTOS_PRIORITY_NONE;
+  mutex->name          = attrs->name;
+  mutex->attr_bits     = attrs->attr_bits;
+  mutex->count         = 1;
+  mutex->acquired      = NULL;
+  mutex->blocked       = NULL;
+  mutex->init_priority = RTOS_PRIORITY_NONE;
 
   // Add the mutex to the global list of mutex
   mutex->next  = rtos_mutexes;
@@ -110,7 +110,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
       rtos_running_task->state = RTOS_TASK_BLOCKED;
 
-      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
+      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
         mutex->acquired->priority = rtos_running_task->priority;
       }
 
@@ -143,7 +143,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       rtos_running_task->wake_time_ticks = rtosGetSysTickCount() + timeout;
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
 
-      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
+      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
         mutex->acquired->priority = rtos_running_task->priority;
       }
 
@@ -195,8 +195,8 @@ rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
     rtosTaskHandle_t unblocked = rtosPopTaskListHead(&mutex->blocked);
     rtosInsertTaskListTail(rtosGetReadyTaskQueue(unblocked->priority), unblocked);
 
-    if (rtos_running_task->priority != mutex->initPriority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
-      rtos_running_task->priority = mutex->initPriority;
+    if (rtos_running_task->priority != mutex->init_priority && mutex->attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
+      rtos_running_task->priority = mutex->init_priority;
     }
 
     __enable_irq();

@@ -23,11 +23,12 @@ typedef struct {
 
 /// Mutex
 typedef struct rtosMutex_tag {
+  const char*           name;
   uint32_t              count;
+  uint32_t              attr_bits;
   rtosTaskHandle_t      blocked;
   rtosTaskHandle_t      acquired;
-  rtosPriority_t        initPriority;
-  rtosMutexAttr_t       attrs;
+  rtosPriority_t        init_priority;
   struct rtosMutex_tag* next;
 } rtosMutex_t;
 

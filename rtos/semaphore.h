@@ -14,7 +14,7 @@
 /// Semaphore attributes
 typedef struct {
   const char* name;
-  uint32_t    attr_bits;  // Unused
+  // uint32_t attr_bits;  // Unused
 } rtosSemaphoreAttr_t;
 
 /// Semaphore
