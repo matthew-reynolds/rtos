@@ -19,10 +19,16 @@ typedef struct {
 
 /// Semaphore
 typedef struct semaphore {
+<<<<<<< HEAD
   const char*      name;
   uint32_t         count;
   uint32_t         max;
   rtosTaskHandle_t blocked;
+=======
+  uint32_t max;
+  uint32_t count;
+	rtosSemaphoreAttr_t attr;
+>>>>>>> Beginnings of Mutex
 } rtosSemaphore_t;
 
 typedef rtosSemaphore_t* rtosSemaphoreHandle_t;

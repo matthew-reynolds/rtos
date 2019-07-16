@@ -17,7 +17,7 @@
 
 /// Mutex attributes
 typedef struct {
-  const char* name;
+  const char* name;1
   uint32_t    attr_bits;
 } rtosMutexAttr_t;
 
