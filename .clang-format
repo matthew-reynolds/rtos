@@ -22,7 +22,6 @@ BraceWrapping:
   SplitEmptyRecord:       false
   SplitEmptyNamespace:    false
 
-
 ## Single liners
 # Disallow all single liners, except for empty functions and
 # single-statement member functions.
@@ -110,4 +109,7 @@ MaxEmptyLinesToKeep:              2
 #               ccccccc);
 PenaltyBreakAssignment: 1000
 PenaltyBreakBeforeFirstCallParameter: 1000
+
+## Prevent break after return type in function declaration
+PenaltyReturnTypeOnItsOwnLine: 1000
 ...

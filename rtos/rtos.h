@@ -14,7 +14,6 @@
 #include "semaphore.h"
 #include "task.h"
 
-
 uint32_t rtosGetSysTickCount(void);
 
 void rtosInitialize(void);

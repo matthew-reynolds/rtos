@@ -18,5 +18,4 @@ typedef enum {
   RTOS_ERROR_ISR,
 } rtosStatus_t;
 
-
 #endif  // __RTOS_STATUS_H

@@ -6,8 +6,8 @@
 #ifndef __RTOS_SEMAPHORE_H
 #define __RTOS_SEMAPHORE_H
 
-#include <stdint.h>
 #include "status.h"
+#include <stdint.h>
 
 #define MAX_SEMAPHORES 10
 
@@ -23,17 +23,17 @@ typedef struct {
 
 /// Semaphore
 typedef struct semaphore {
-  uint32_t max;
-  uint32_t count;
-	const char* name;
+  uint32_t    max;
+  uint32_t    count;
+  const char* name;
 } rtosSemaphore_t;
 
 typedef rtosSemaphore_t* rtosSemaphoreHandle_t;
 
-rtosStatus_t osSemaphoreNew(uint32_t max,
-                            uint32_t init,
+rtosStatus_t osSemaphoreNew(uint32_t                   max,
+                            uint32_t                   init,
                             const rtosSemaphoreAttr_t* attrs,
-                            rtosSemaphoreHandle_t* semaphore);
+                            rtosSemaphoreHandle_t*     semaphore);
 rtosStatus_t osSemaphoreDelete(const rtosSemaphoreHandle_t semaphore);
 rtosStatus_t osSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_t timeout);
 rtosStatus_t osSemaphoreRelease(const rtosSemaphoreHandle_t semaphore);
