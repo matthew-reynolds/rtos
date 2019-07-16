@@ -58,7 +58,7 @@ typedef void (*rtosTaskFunc_t)(void* args);
 void         rtosTaskInitAll(void);
 void         rtosTaskInit(uint32_t task_id);
 rtosStatus_t rtosTaskNew(rtosTaskFunc_t func, void* arg, rtosPriority_t priority, rtosTaskHandle_t* task);
-rtosStatus_t rtosTaskDelete(const rtosTaskHandle_t task);
+rtosStatus_t rtosTaskDelete(rtosTaskHandle_t task);
 
 rtosTaskHandle_t rtosPopTaskListHead(rtosTaskHandle_t* list);
 void             rtosInsertTaskListHead(rtosTaskHandle_t* list, rtosTaskHandle_t task);

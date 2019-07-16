@@ -32,8 +32,8 @@ rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               uint32_t                   init,
                               const rtosSemaphoreAttr_t* attrs,
                               rtosSemaphoreHandle_t      semaphore);
-rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore);
-rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_t timeout);
-rtosStatus_t rtosSemaphoreRelease(const rtosSemaphoreHandle_t semaphore);
+rtosStatus_t rtosSemaphoreDelete(rtosSemaphoreHandle_t semaphore);
+rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t timeout);
+rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore);
 
 #endif  // __RTOS_SEMAPHORE_H

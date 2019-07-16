@@ -29,8 +29,8 @@ typedef struct {
 typedef rtosMutex_t* rtosMutexHandle_t;
 
 rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t* mutex);
-rtosStatus_t rtosMutexDelete(const rtosMutexHandle_t mutex);
-rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout);
-rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex);
+rtosStatus_t rtosMutexDelete(rtosMutexHandle_t mutex);
+rtosStatus_t rtosMutexAcquire(rtosMutexHandle_t mutex, uint32_t timeout);
+rtosStatus_t rtosMutexRelease(rtosMutexHandle_t mutex);
 
 #endif  // __RTOS_MUTEX_H

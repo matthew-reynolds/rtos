@@ -45,7 +45,7 @@ rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
  * @return  - RTOS_OK on success
  *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
  */
-rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore) {
+rtosStatus_t rtosSemaphoreDelete(rtosSemaphoreHandle_t semaphore) {
 
   // Ensure the semaphore handle is valid
   if (semaphore == NULL) {
@@ -65,7 +65,7 @@ rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore) {
  *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
  *          - RTOS_ERROR_PARAMETER if the semaphore could not be acquired and no timeout was specified
  */
-rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_t timeout) {
+rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t timeout) {
 
   // Ensure the semaphore handle is valid
   if (semaphore == NULL) {
@@ -118,7 +118,7 @@ rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_
  * @return  - RTOS_OK on success
  *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
  */
-rtosStatus_t rtosSemaphoreRelease(const rtosSemaphoreHandle_t semaphore) {
+rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
 
   // Ensure the semaphore handle is valid
   if (semaphore == NULL) {
