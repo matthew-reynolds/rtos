@@ -10,13 +10,23 @@
 #include "rtos.h"
 #include "semaphore.h"
 
-uint32_t sem_count = 0;
-
+/**
+ * Create a new semaphore
+ *
+ * @param max       The maximum value the semaphore can hold
+ * @param init      The initial value of the semaphore
+ * @param attrs     Any additional semaphore attributes
+ * @param semaphore The semaphore object to initialize
+ *
+ * @return  - RTOS_OK on success
+ *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
+ */
 rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               uint32_t                   init,
                               const rtosSemaphoreAttr_t* attrs,
                               rtosSemaphoreHandle_t      semaphore) {
 
+  // Ensure the semaphore handle is valid
   if (semaphore == NULL) {
     return RTOS_ERROR_PARAMETER;
   }
@@ -29,11 +39,39 @@ rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
   return RTOS_OK;
 }
 
+/**
+ * Delete the specified semaphore object
+ *
+ * @return  - RTOS_OK on success
+ *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
+ */
 rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore) {
+
+  // Ensure the semaphore handle is valid
+  if (semaphore == NULL) {
+    return RTOS_ERROR_PARAMETER;
+  }
+
+  // TODO: Clean up
+
   return RTOS_OK;
 }
 
+/**
+ * Attempt to acquire (decrement) the specified semaphore
+ *
+ * @return  - RTOS_OK on success
+ *          - RTOS_ERROR_TIMEOUT if the semaphore could not be acquired in the specified timeout
+ *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
+ *          - RTOS_ERROR_PARAMETER if the semaphore could not be acquired and no timeout was specified
+ */
 rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_t timeout) {
+
+  // Ensure the semaphore handle is valid
+  if (semaphore == NULL) {
+    return RTOS_ERROR_PARAMETER;
+  }
+
   uint32_t startTicks = rtosGetSysTickCount();
   __disable_irq();
 
@@ -74,10 +112,23 @@ rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_
   }
 }
 
+/**
+ * Release (increment) the specified semaphore
+ *
+ * @return  - RTOS_OK on success
+ *          - RTOS_ERROR_PARAMETER if the semaphore is NULL or invalid
+ */
 rtosStatus_t rtosSemaphoreRelease(const rtosSemaphoreHandle_t semaphore) {
+
+  // Ensure the semaphore handle is valid
+  if (semaphore == NULL) {
+    return RTOS_ERROR_PARAMETER;
+  }
+
   // Disable the IRQ and then increment the count
   __disable_irq();
   semaphore->count++;
   __enable_irq();
+
   return RTOS_OK;
 }
