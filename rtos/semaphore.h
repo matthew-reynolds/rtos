@@ -7,7 +7,6 @@
 #define __RTOS_SEMAPHORE_H
 
 #include <stdint.h>
-
 #include "status.h"
 
 #define MAX_SEMAPHORES 10
@@ -16,17 +15,18 @@
 #define rtosSemaphoreSomething 0x00000000U
 
 /// Semaphore attributes
+// Gonna keep this in but I put the attributes just in the semaphore struct
 typedef struct {
   const char* name;
   uint32_t    attr_bits;
 } rtosSemaphoreAttr_t;
 
 /// Semaphore
-typedef struct semaphore
-{
+typedef struct semaphore {
   uint32_t max;
-  unit32_t count;
-} rtosSemaphore_t;;
+  uint32_t count;
+	const char* name;
+} rtosSemaphore_t;
 
 typedef rtosSemaphore_t* rtosSemaphoreHandle_t;
 
