@@ -72,7 +72,6 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
     return RTOS_ERROR_PARAMETER;
   }
 
-  uint32_t startTicks = rtosGetSysTickCount();
   __disable_irq();
 
   // Timeout value is set to zero so try once and then exit
@@ -85,9 +84,12 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
       __enable_irq();
       return RTOS_OK;
     }
-    // Timeout value is set to wat forever so loop until it is ready
-  } else if (timeout == rtosWaitForever) {
+  }
+
+  // Timeout value is set to wait forever so loop until it is ready
+  else if (timeout == rtosWaitForever) {
     while (semaphore->count <= 0) {
+      // TODO: Set the task to blocked
       __enable_irq();
       __disable_irq();
     }
@@ -95,13 +97,19 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
     semaphore->count--;
     __enable_irq();
     return RTOS_OK;
-    // Timeout value is a given number of ticks, will do it once and check if
-    // desired time has been reached
-  } else {
-    do {
+
+  }
+
+  // Timeout value is a given number of ticks, will do it once and check if desired time has been reached
+  else {
+
+    uint32_t start_ticks = rtosGetSysTickCount();
+
+    while ((rtosGetSysTickCount() - start_ticks) < timeout && semaphore->count <= 0) {
+      // TODO: Set the task to blocked
       __enable_irq();
       __disable_irq();
-    } while ((uint32_t)(startTicks - rtosGetSysTickCount()) < timeout && semaphore->count <= 0);
+    }
 
     if (semaphore->count <= 0) {
       return RTOS_ERROR_TIMEOUT;
