@@ -179,6 +179,7 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
  * Release (increment) the specified semaphore
  *
  * @return  - RTOS_OK               on success
+ *          - RTOS_ERROR_RESOURCE   if the semaphore could not be released (count == max)
  *          - RTOS_ERROR_PARAMETER  if the semaphore is NULL or invalid
  */
 rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
@@ -188,18 +189,18 @@ rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
     return RTOS_ERROR_PARAMETER;
   }
 
-  // TODO: Check max value
-
-  // Disable interrupts and then increment the count
+  // Disable interrupts
   __disable_irq();
 
+  // Ensure the maximum value has not been reached
   if (semaphore->count == semaphore->max) {
-    
     return RTOS_ERROR_RESOURCE;
   }
+
+  // Increment the count
   semaphore->count++;
 
-  // If there are blocked tasks, unblock the first task
+  // If there are blocked tasks, unblock the first task in the queue
   if (semaphore->blocked != NULL) {
     rtosTaskHandle_t unblocked = rtosPopTaskListHead(&semaphore->blocked);
     unblocked->state           = RTOS_TASK_READY;
@@ -211,6 +212,5 @@ rtosStatus_t rtosSemaphoreRelease(rtosSemaphoreHandle_t semaphore) {
   }
 
   __enable_irq();
-
   return RTOS_OK;
 }

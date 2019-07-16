@@ -12,8 +12,8 @@
 #include "status.h"
 
 // Define mutex attribute options
-#define rtosMutexPrioInherit 0x00000002U
-#define rtosMutexRobust 0x00000008U
+#define RTOS_MUTEX_PRIO_INHERIT 0x00000002U
+#define RTOS_MUTEX_ROBUST 0x00000008U
 
 /// Mutex attributes
 typedef struct {

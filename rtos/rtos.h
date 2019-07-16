@@ -15,6 +15,8 @@
 #include "task.h"
 
 uint32_t rtosGetSysTickCount(void);
+uint32_t rtosGetSysTickFreq(void);
+void     rtosSetSysTickFreq(uint32_t freq);
 
 void rtosInitialize(void);
 void rtosBegin(void);

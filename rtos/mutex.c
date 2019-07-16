@@ -23,7 +23,7 @@ rtosMutexHandle_t rtos_mutexes = NULL;
  *          - RTOS_ERROR_PARAMETER  if the mutex is NULL or invalid
  */
 rtosStatus_t rtosMutexNew(const rtosMutexAttr_t* attrs, rtosMutexHandle_t mutex) {
-    
+
   // Ensure the mutex handle is valid
   if (mutex == NULL) {
     return RTOS_ERROR_PARAMETER;
@@ -80,7 +80,7 @@ rtosStatus_t rtosMutexDelete(const rtosMutexHandle_t mutex) {
  *          - RTOS_ERROR_RESOURCE   if the mutex could not be acquired and no timeout was specified
  */
 rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
-    
+
 // Ensure the mutex handle is valid
   if (mutex == NULL) {
     return RTOS_ERROR_PARAMETER;
@@ -102,14 +102,14 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
   }
 
   // Timeout value is set to wait forever so loop until it is ready
-  else if (timeout == rtosWaitForever) {
+  else if (timeout == RTOS_WAIT_FOREVER) {
 
     // If the mutex is unavailable, block the current task
     if (mutex->count == 0) {
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
       rtos_running_task->state = RTOS_TASK_BLOCKED;
 
-      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & rtosMutexPrioInherit) {
+      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
           mutex->acquired->priority = rtos_running_task->priority;
       }
 
@@ -142,7 +142,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       rtos_running_task->wake_time_ticks = rtosGetSysTickCount() + timeout;
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
 
-      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & rtosMutexPrioInherit) {
+      if (rtos_running_task->priority > mutex->acquired->priority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
           mutex->acquired->priority = rtos_running_task->priority;
       }
 
@@ -194,7 +194,7 @@ rtosStatus_t rtosMutexRelease(const rtosMutexHandle_t mutex) {
     rtosTaskHandle_t unblocked = rtosPopTaskListHead(&mutex->blocked);
     rtosInsertTaskListTail(rtosGetReadyTaskQueue(unblocked->priority), unblocked);
 
-    if (rtos_running_task->priority != mutex->initPriority && mutex->attrs.attr_bits & rtosMutexPrioInherit) {
+    if (rtos_running_task->priority != mutex->initPriority && mutex->attrs.attr_bits & RTOS_MUTEX_PRIO_INHERIT) {
         rtos_running_task->priority = mutex->initPriority;
     }
 
