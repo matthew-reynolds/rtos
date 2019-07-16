@@ -6,24 +6,27 @@
 #ifndef __RTOS_SEMAPHORE_H
 #define __RTOS_SEMAPHORE_H
 
-#include "status.h"
 #include <stdint.h>
+
+#include "status.h"
+#include "task.h"
 
 // Define semaphore attribute options
 #define rtosSemaphoreSomething 0x00000000U
 
 /// Semaphore attributes
-// Gonna keep this in but I put the attributes just in the semaphore struct
 typedef struct {
   const char* name;
-  uint32_t    attr_bits;
+  uint32_t    attr_bits; // Unused
 } rtosSemaphoreAttr_t;
 
 /// Semaphore
 typedef struct semaphore {
-  uint32_t    max;
-  uint32_t    count;
-  const char* name;
+  const char*      name;
+  uint32_t         count;
+  uint32_t         max;
+  rtosTaskHandle_t blocked; // TODO: Handle blocked task being deleted
+
 } rtosSemaphore_t;
 
 typedef rtosSemaphore_t* rtosSemaphoreHandle_t;
