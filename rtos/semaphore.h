@@ -19,11 +19,11 @@ typedef struct {
 
 /// Semaphore
 typedef struct rtosSemaphore_tag {
-  const char*               name;
-  uint32_t                  count;
-  uint32_t                  max;
-  rtosTaskHandle_t          blocked;
-  struct rtosSemaphore_tag* next;
+  const char*               name;     ///< The name of semaphore
+  uint32_t                  count;    ///< The current semaphore value
+  uint32_t                  max;      ///< The max semaphore value
+  rtosTaskHandle_t          blocked;  ///< The list of tasks blocked by the semaphore
+  struct rtosSemaphore_tag* next;     ///< The next semaphore in the global list
 } rtosSemaphore_t;
 
 typedef rtosSemaphore_t* rtosSemaphoreHandle_t;

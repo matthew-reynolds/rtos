@@ -23,13 +23,13 @@ typedef struct {
 
 /// Mutex
 typedef struct rtosMutex_tag {
-  const char*           name;
-  uint32_t              count;
-  uint32_t              attr_bits;
-  rtosTaskHandle_t      blocked;
-  rtosTaskHandle_t      acquired;
-  rtosPriority_t        init_priority;
-  struct rtosMutex_tag* next;
+  const char*           name;           ///< The name of the mutex
+  uint32_t              count;          ///< The current mutex value
+  uint32_t              attr_bits;      ///< Attribute bits. Default=0
+  rtosTaskHandle_t      blocked;        ///< The list of tasks blocked by the mutex
+  rtosTaskHandle_t      acquired;       ///< The task that acquired the mutex
+  rtosPriority_t        init_priority;  ///< The priority of acquired
+  struct rtosMutex_tag* next;           ///< The next mutex in the global list
 } rtosMutex_t;
 
 typedef rtosMutex_t* rtosMutexHandle_t;
