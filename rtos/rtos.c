@@ -12,7 +12,8 @@
 #include "context.h"
 #include "rtos.h"
 
-uint32_t rtos_ticks = 0;
+uint32_t rtos_ticks   = 0;
+uint32_t systick_freq = 1000;  // Default systick frequency = 1000Hz (1ms)
 
 /**
  * SysTick ISR
@@ -67,11 +68,28 @@ uint32_t rtosGetSysTickCount(void) {
 }
 
 /**
+ * Get the system tick frequency, in Hz
+ */
+uint32_t rtosGetSysTickFreq(void) {
+  return systick_freq;
+}
+
+/**
+ * Set the system tick frequency, in Hz
+ */
+void rtosSetSysTickFreq(uint32_t freq) {
+  systick_freq = freq;
+  SysTick_Config(SystemCoreClock / systick_freq);
+}
+
+
+/**
  * Initialize the RTOS
  */
 void rtosInitialize(void) {
-  // Set the systick to 1ms
-  SysTick_Config(SystemCoreClock / 1000);
+
+  // Ensure the systick frequency is set
+  rtosSetSysTickFreq(systick_freq);
 
   // Initialize all the task control blocks
   rtosTaskInitAll();
