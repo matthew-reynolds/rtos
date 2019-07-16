@@ -10,8 +10,6 @@
 
 #include "status.h"
 
-#define MAX_MUTEXES 10
-
 // Define mutex attribute options
 #define osMutexRecursive 0x00000001U
 #define osMutexPrioInherit 0x00000002U
