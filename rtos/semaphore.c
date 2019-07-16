@@ -12,10 +12,10 @@
 
 uint32_t sem_count = 0;
 
-rtosStatus_t osSemaphoreNew(uint32_t                   max,
-                            uint32_t                   init,
-                            const rtosSemaphoreAttr_t* attrs,
-                            rtosSemaphoreHandle_t*     semaphore) {
+rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
+                              uint32_t                   init,
+                              const rtosSemaphoreAttr_t* attrs,
+                              rtosSemaphoreHandle_t*     semaphore) {
 
   if (sem_count < MAX_SEMAPHORES) {
     const char*      name = attrs->name;
@@ -30,35 +30,33 @@ rtosStatus_t osSemaphoreNew(uint32_t                   max,
   }
 }
 
-rtosStatus_t osSemaphoreDelete(rtosSemaphore_t* id) {
-
-  free(id);
+rtosStatus_t rtosSemaphoreDelete(const rtosSemaphoreHandle_t semaphore) {
+  free(semaphore);
   return RTOS_OK;
 }
 
-rtosStatus_t osSemaphoreAcquire(rtosSemaphore_t* id, uint32_t timeout) {
-
+rtosStatus_t rtosSemaphoreAcquire(const rtosSemaphoreHandle_t semaphore, uint32_t timeout) {
   uint32_t startTicks = rtosGetSysTickCount();
   __disable_irq();
 
   // Timeout value is set to zero so try once and then exit
   if (timeout == 0) {
-    if (id->count <= 0) {
+    if (semaphore->count <= 0) {
       return RTOS_ERROR_RESOURCE;
     } else {
 
-      id->count--;
+      semaphore->count--;
       __enable_irq();
       return RTOS_OK;
     }
     // Timeout value is set to wat forever so loop until it is ready
   } else if (timeout == rtosWaitForever) {
-    while (id->count <= 0) {
+    while (semaphore->count <= 0) {
       __enable_irq();
       __disable_irq();
     }
 
-    id->count--;
+    semaphore->count--;
     __enable_irq();
     return RTOS_OK;
     // Timeout value is a given number of ticks, will do it once and check if
@@ -67,21 +65,21 @@ rtosStatus_t osSemaphoreAcquire(rtosSemaphore_t* id, uint32_t timeout) {
     do {
       __enable_irq();
       __disable_irq();
-    } while ((uint32_t)(startTicks - rtosGetSysTickCount()) < timeout && id->count <= 0);
+    } while ((uint32_t)(startTicks - rtosGetSysTickCount()) < timeout && semaphore->count <= 0);
 
-    if (id->count <= 0) {
+    if (semaphore->count <= 0) {
       return RTOS_ERROR_TIMEOUT;
     } else {
-      id->count--;
+      semaphore->count--;
       return RTOS_OK;
     }
   }
 }
 
-rtosStatus_t osSemaphoreRelease(rtosSemaphore_t* id) {
+rtosStatus_t rtosSemaphoreRelease(const rtosSemaphoreHandle_t semaphore) {
   // Disable the IRQ and then increment the count
   __disable_irq();
-  id->count++;
+  semaphore->count++;
   __enable_irq();
   return RTOS_OK;
 }
