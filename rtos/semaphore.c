@@ -22,15 +22,15 @@ rtosSemaphoreHandle_t rtos_semaphores = NULL;
  * @param semaphore The semaphore object to initialize
  *
  * @return  - RTOS_OK               on success
- *          - RTOS_ERROR_PARAMETER  if the semaphore is NULL or invalid
+ *          - RTOS_ERROR_PARAMETER  if the semaphore is NULL or the initial value is greater than the max
  */
 rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               uint32_t                   init,
                               const rtosSemaphoreAttr_t* attrs,
                               rtosSemaphoreHandle_t      semaphore) {
 
-  // Ensure the semaphore handle is valid
-  if (semaphore == NULL | init > max) {
+  // Ensure the semaphore handle and initial value are valid
+  if (semaphore == NULL || init > max) {
     return RTOS_ERROR_PARAMETER;
   }
 
