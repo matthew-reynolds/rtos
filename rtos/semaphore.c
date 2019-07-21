@@ -30,7 +30,7 @@ rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               rtosSemaphoreHandle_t      semaphore) {
 
   // Ensure the semaphore handle is valid
-  if (semaphore == NULL) {
+  if (semaphore == NULL | init > max) {
     return RTOS_ERROR_PARAMETER;
   }
 
