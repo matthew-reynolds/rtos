@@ -29,8 +29,8 @@ rtosStatus_t rtosSemaphoreNew(uint32_t                   max,
                               const rtosSemaphoreAttr_t* attrs,
                               rtosSemaphoreHandle_t      semaphore) {
 
-  // Ensure the semaphore handle and init values are valid
-  if (semaphore == NULL | init > max) {
+  // Ensure the semaphore handle and initial value are valid
+  if (semaphore == NULL || init > max) {
     return RTOS_ERROR_PARAMETER;
   }
 
