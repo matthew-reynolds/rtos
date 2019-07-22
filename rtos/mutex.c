@@ -130,6 +130,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       // If priority inheritance is enabled, promote the priority of the task that acquired the mutex
       if ((mutex->attr_bits & RTOS_MUTEX_PRIO_INHERIT) && rtos_running_task->priority > mutex->acquired->priority) {
         mutex->acquired->priority = rtos_running_task->priority;
+        rtosInsertTaskListTail(rtosGetReadyTaskQueue(mutex->acquired->priority), mutex->acquired);
       }
 
       __enable_irq();
@@ -165,6 +166,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       // If priority inheritance is enabled, promote the priority of the task that acquired the mutex
       if ((mutex->attr_bits & RTOS_MUTEX_PRIO_INHERIT) && rtos_running_task->priority > mutex->acquired->priority) {
         mutex->acquired->priority = rtos_running_task->priority;
+        rtosInsertTaskListTail(rtosGetReadyTaskQueue(mutex->acquired->priority), mutex->acquired);
       }
 
       __enable_irq();
