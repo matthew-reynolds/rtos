@@ -435,6 +435,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>test</GroupName>
+          <Files>
+            <File>
+              <FileName>test_mutex_prioinherit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_mutex_prioinherit.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
