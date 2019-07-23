@@ -442,6 +442,11 @@
               <FileType>1</FileType>
               <FilePath>.\test\test_mutex_prioinherit.c</FilePath>
             </File>
+            <File>
+              <FileName>test_semaphore_blocking.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_semaphore_blocking.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
