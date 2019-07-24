@@ -10,6 +10,9 @@
 #include "../rtos/rtos.h"
 
 rtosMutex_t printMutex;
+uint32_t itr = 0;
+
+
 
 typedef struct {
 	rtosMutex_t mutex;
@@ -28,7 +31,9 @@ void init(barrier_t *b, uint32_t n) {
 }
 
 void sync(barrier_t * b) {
+	rtosMutexAcquire(&printMutex, RTOS_WAIT_FOREVER);
 	printf("SYNC \n");
+	rtosMutexRelease(&printMutex);
 	rtosMutexAcquire(&b->mutex, RTOS_WAIT_FOREVER); {
 		b->count++;
 		if(b->count == b->n) {
@@ -47,7 +52,7 @@ void sync(barrier_t * b) {
 			rtosSemaphoreRelease(&b->turnstile2);
 
 			rtosMutexAcquire(&printMutex, RTOS_WAIT_FOREVER);
-			printf("...\n");
+			printf("Tasks Have been synced\n");
 			rtosMutexRelease(&printMutex);
 		}
 	} rtosMutexRelease(&b->mutex);
@@ -62,16 +67,17 @@ void task(void *args) {
 		printf("%s\n", (char const *)args);
 		rtosMutexRelease(&printMutex);
 
-		rtosDelay(rtosGetSysTickFreq()*(rand()%3 + 1));
+		rtosDelay(rtosGetSysTickFreq()/(rand()%3 + 1));
 		sync(&b);
 		rtosMutexAcquire(&printMutex, RTOS_WAIT_FOREVER);
 		printf("Finished Sync");
+		itr++;
 		rtosMutexRelease(&printMutex);
 	}
 }
 
 void test_semaphore_blocking(void) {
-	srand(2000000001);
+	srand(100);
 	rtosInitialize();
 	rtosMutexNew(NULL, &printMutex);
 	init(&b, 3);
