@@ -12,9 +12,9 @@
 #include "../rtos/rtos.h"
 
 rtosMutex_t printMutex;
-uint32_t itr = 0;
-
-
+rtosTaskHandle_t task1;
+rtosTaskHandle_t task2;
+rtosTaskHandle_t task3;
 
 typedef struct {
 	rtosMutex_t mutex;
@@ -54,7 +54,7 @@ void sync(barrier_t * b) {
 			rtosSemaphoreRelease(&b->turnstile2);
 
 			rtosMutexAcquire(&printMutex, RTOS_WAIT_FOREVER);
-			printf("Tasks Have been synced\n");
+			printf("Tasks have synced\n");
 			rtosMutexRelease(&printMutex);
 		}
 	} rtosMutexRelease(&b->mutex);
@@ -65,15 +65,10 @@ void sync(barrier_t * b) {
 barrier_t b;
 void task(void *args) {
 	while(true) {
-		rtosMutexAcquire(&printMutex, RTOS_WAIT_FOREVER);
-		printf("%s\n", (char const *)args);
-		rtosMutexRelease(&printMutex);
-
 		rtosDelay(rtosGetSysTickFreq()/(rand()%3 + 1));
 		sync(&b);
 		rtosMutexAcquire(&printMutex, RTOS_WAIT_FOREVER);
-		printf("Finished Sync");
-		itr++;
+		printf("Finished Sync \n");
 		rtosMutexRelease(&printMutex);
 	}
 }
@@ -83,9 +78,9 @@ int main(void) {
 	rtosInitialize();
 	rtosMutexNew(NULL, &printMutex);
 	init(&b, 3);
-	rtosTaskNew(task, NULL, RTOS_PRIORITY_NORMAL, NULL);
-	rtosTaskNew(task, NULL, RTOS_PRIORITY_NORMAL, NULL);
-	rtosTaskNew(task, NULL, RTOS_PRIORITY_NORMAL, NULL);
+	rtosTaskNew(task, NULL, RTOS_PRIORITY_NORMAL, &task1);
+	rtosTaskNew(task, NULL, RTOS_PRIORITY_NORMAL, &task2);
+	rtosTaskNew(task, NULL, RTOS_PRIORITY_NORMAL, &task3);
 	rtosBegin();
 	for( ; ; ) ;
 }

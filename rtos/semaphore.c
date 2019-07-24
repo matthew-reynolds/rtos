@@ -124,20 +124,13 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
   else if (timeout == RTOS_WAIT_FOREVER) {
 
     // If the semaphore is unavailable, block the current task
-    if (semaphore->count == 0) {
+    while (semaphore->count == 0) {
       rtos_running_task->state = RTOS_TASK_BLOCKED;
       rtosInsertTaskListTail(&semaphore->blocked, rtos_running_task);
 
       __enable_irq();
       rtosInvokeScheduler();
       __disable_irq();
-    }
-
-    // Task was unblocked in an unusual way, such as by semaphore deletion, leaving the semaphore still unavailable.
-    // Return an error indicating that the semaphore was deleted but is still unavailable
-    if (semaphore->count == 0) {
-      __enable_irq();
-      return RTOS_ERROR;
     }
 
     // Once the semaphore is available, acquire it
@@ -151,7 +144,7 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
   else {
 
     // If the semaphore is unavailable, block the current task
-    if (semaphore->count == 0) {
+    while (semaphore->count == 0) {
       rtos_running_task->state           = RTOS_TASK_BLOCKED_TIMEOUT;
       rtos_running_task->wake_time_ticks = rtosGetSysTickCount() + timeout;
       rtosInsertTaskListTail(&semaphore->blocked, rtos_running_task);
@@ -159,13 +152,6 @@ rtosStatus_t rtosSemaphoreAcquire(rtosSemaphoreHandle_t semaphore, uint32_t time
       __enable_irq();
       rtosInvokeScheduler();
       __disable_irq();
-    }
-
-    // TODO: Detect if the task was unblocked due to the semaphore becoming available or due to the semaphore being
-    // deleted
-    if (semaphore->count == 0) {
-      __enable_irq();
-      return RTOS_ERROR_TIMEOUT;
     }
 
     // Once the semaphore is available, acquire it

@@ -123,7 +123,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
   else if (timeout == RTOS_WAIT_FOREVER) {
 
     // If the mutex is unavailable, block the current task
-    if (mutex->count == 0) {
+    while (mutex->count == 0) {
       rtos_running_task->state = RTOS_TASK_BLOCKED;
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
 
@@ -136,13 +136,6 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       __enable_irq();
       rtosInvokeScheduler();
       __disable_irq();
-    }
-
-    // Task was unblocked in an unusual way, such as by mutex deletion, leaving the mutex still unavailable.
-    // Return an error indicating that the mutex was deleted but is still unavailable
-    if (mutex->count == 0) {
-      __enable_irq();
-      return RTOS_ERROR;
     }
 
     // Once the mutex is available, acquire it
@@ -158,7 +151,7 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
   else {
 
     // If the mutex is unavailable, block the current task
-    if (mutex->count == 0) {
+    while (mutex->count == 0) {
       rtos_running_task->state           = RTOS_TASK_BLOCKED_TIMEOUT;
       rtos_running_task->wake_time_ticks = rtosGetSysTickCount() + timeout;
       rtosInsertTaskListTail(&mutex->blocked, rtos_running_task);
@@ -172,12 +165,6 @@ rtosStatus_t rtosMutexAcquire(const rtosMutexHandle_t mutex, uint32_t timeout) {
       __enable_irq();
       rtosInvokeScheduler();
       __disable_irq();
-    }
-
-    // TODO: Detect if the task was unblocked due to the mutex becoming available or due to the mutex being deleted
-    if (mutex->count == 0) {
-      __enable_irq();
-      return RTOS_ERROR_TIMEOUT;
     }
 
     // Once the mutex is available, acquire it
