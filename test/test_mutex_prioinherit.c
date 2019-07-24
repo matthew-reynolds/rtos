@@ -3,6 +3,8 @@
  *
  * Test mutex priority inheritance
  */
+#if TEST_MUTEX_PRIOINHERIT
+ 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,8 +64,7 @@ void task3(void* arg) {
   rtosTaskExit();
 }
 
-// Essentially main()
-void test_mutex_prioinherit(void) {
+int main(void) {
   printf("\n\n\n\n\n");
 
   rtosInitialize();
@@ -76,3 +77,5 @@ void test_mutex_prioinherit(void) {
 
   rtosBegin();
 }
+
+#endif

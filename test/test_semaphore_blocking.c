@@ -3,6 +3,8 @@
  *
  * Test mutex priority inheritance
  */
+#if TEST_SEMAPHORE
+ 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,7 +78,7 @@ void task(void *args) {
 	}
 }
 
-void test_semaphore_blocking(void) {
+int main(void) {
 	srand(100);
 	rtosInitialize();
 	rtosMutexNew(NULL, &printMutex);
@@ -87,3 +89,5 @@ void test_semaphore_blocking(void) {
 	rtosBegin();
 	for( ; ; ) ;
 }
+
+#endif

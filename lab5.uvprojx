@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>__RTGT_UART_SIM</Define>
+              <Define>__RTGT_UART TEST_SCHEDULER</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
@@ -392,11 +392,6 @@
               <FileType>1</FileType>
               <FilePath>.\src\uart.c</FilePath>
             </File>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\main.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -446,6 +441,16 @@
               <FileName>test_semaphore_blocking.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\test\test_semaphore_blocking.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_scheduler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_scheduler.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_scheduler_timeslice.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_scheduler_timeslice.c</FilePath>
             </File>
           </Files>
         </Group>
