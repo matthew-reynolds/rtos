@@ -164,7 +164,11 @@ void rtosInvokeScheduler(void) {
     }
 
     // Invoke the PendSV exception to perform the context switch
+    popR4R10();
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    asm("ISB");
+    asm("DSB");
+    pushR4R10();
   }
 }
 
@@ -172,6 +176,7 @@ void rtosInvokeScheduler(void) {
  * Perform a context switch to the task stored in next_task
  */
 void rtosPerformContextSwitch(void) {
+  popR4R6();
   rtos_running_task->stack_pointer = rtosStoreContext();
 
   // Set the running task to the next ready task
@@ -179,6 +184,7 @@ void rtosPerformContextSwitch(void) {
   rtos_running_task->state = RTOS_TASK_RUNNING;
 
   rtosRestoreContext(rtos_running_task->stack_pointer);
+  pushR4R6();
 }
 
 /**
@@ -214,7 +220,7 @@ rtosStatus_t rtosDelay(uint32_t ticks) {
 rtosStatus_t rtosDelayUntil(uint32_t ticks) {
   const uint32_t const_rtos_ticks = rtos_ticks;
 
-  // TODO: Disable systick interrupt?
+  __disable_irq();
 
   rtos_running_task->wake_time_ticks = ticks;
   rtos_running_task->state           = RTOS_TASK_BLOCKED;
@@ -271,6 +277,7 @@ rtosStatus_t rtosDelayUntil(uint32_t ticks) {
     }
   }
 
+  __enable_irq();
   rtosInvokeScheduler();
   return RTOS_OK;
 }

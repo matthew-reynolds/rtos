@@ -29,3 +29,45 @@ __asm void rtosRestoreContext(uint32_t sp) {
   BX    LR           // Return
   // clang-format on
 }
+
+__asm void popR4(void) {
+  // clang-format off
+  POP {R4}
+  BX    LR
+  // clang-format on
+}
+
+__asm void pushR4(void) {
+  // clang-format off
+  PUSH {R4}
+  BX    LR
+  // clang-format on
+}
+
+__asm void popR4R6(void) {
+  // clang-format off
+  POP {R4-R6}
+  BX    LR
+  // clang-format on
+}
+
+__asm void pushR4R6(void) {
+  // clang-format off
+  PUSH {R4-R6}
+  BX    LR
+  // clang-format on
+}
+
+__asm void popR4R10(void) {
+  // clang-format off
+  POP {R4-R10}
+  BX    LR
+  // clang-format on
+}
+
+__asm void pushR4R10(void) {
+  // clang-format off
+  PUSH {R4-R10}
+  BX    LR
+  // clang-format on
+}

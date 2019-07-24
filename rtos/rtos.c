@@ -21,6 +21,7 @@ uint32_t systick_freq = 1000;  // Default systick frequency = 1000Hz (1ms)
  * Increment the rtos_tick count, and invoke the scheduler.
  */
 void SysTick_Handler(void) {
+  popR4();
 
   // Increment tick count
   rtos_ticks++;
@@ -29,6 +30,8 @@ void SysTick_Handler(void) {
   if (rtos_running_task != NULL) {
     rtosInvokeScheduler();
   }
+
+  pushR4();
 }
 
 /**
@@ -37,7 +40,9 @@ void SysTick_Handler(void) {
  * Used to start the first task.
  */
 void SVC_Handler(void) {
+  popR4();
   rtosRestoreContext(rtos_running_task->stack_pointer);
+  pushR4();
 }
 
 /**
@@ -46,7 +51,9 @@ void SVC_Handler(void) {
  * Used to perform a context switch.
  */
 void PendSV_Handler(void) {
+  popR4();
   rtosPerformContextSwitch();
+  pushR4();
 }
 
 /**
