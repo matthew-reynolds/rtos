@@ -443,11 +443,6 @@
               <FilePath>.\test\test_semaphore_blocking.c</FilePath>
             </File>
             <File>
-              <FileName>test_semaphore_blocking_backup.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\test\test_semaphore_blocking_backup.c</FilePath>
-            </File>
-            <File>
               <FileName>test_scheduler.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\test\test_scheduler.c</FilePath>
