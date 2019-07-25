@@ -1,10 +1,10 @@
 /**
  * test_scheduler.c
  *
- * Test mutex priority inheritance
+ * Test scheduler by printing the current systick count from each task
  */
 #if TEST_SCHEDULER
- 
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +40,7 @@ int main(void) {
 
   rtosMutexAttr_t attributes = {"", RTOS_MUTEX_PRIO_INHERIT};
   rtosMutexNew(&attributes, &print_mutex);
-  
+
   rtosBegin();
 }
 

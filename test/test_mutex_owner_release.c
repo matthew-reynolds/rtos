@@ -1,7 +1,7 @@
 /**
- * test_mutex_prioinherit.c
+ * test_mutex_owner_release.c
  *
- * Test mutex priority inheritance
+ * Test mutex owner release
  */
 #if TEST_MUTEX_OWNER_RELEASE
 
@@ -22,7 +22,7 @@ void task1(void* arg) {
   printf("First Task: Acquired mutex!\n");
 
   rtosDelay(1000);
-  
+
   printf("First Task: Releasing mutex...\n");
   rtosMutexRelease(&mutex);
   printf("First Task: Successfully released mutex!\n");
@@ -51,7 +51,7 @@ int main(void) {
   printf("\n\n\n\n\n");
 
   rtosInitialize();
-  rtosTaskNew(task1, NULL, RTOS_PRIORITY_NORMAL, &tcb1);  
+  rtosTaskNew(task1, NULL, RTOS_PRIORITY_NORMAL, &tcb1);
   rtosTaskNew(task2, NULL, RTOS_PRIORITY_NORMAL, &tcb2);
 
   // If priority inherit disabled, high-prio task should fail to acquire and deadlock
