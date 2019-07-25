@@ -153,7 +153,7 @@ void rtosInvokeScheduler(void) {
   // Check if a context switch is required
   if (rtos_running_task->state != RTOS_TASK_RUNNING || highest_ready_priority > rtos_running_task->priority
       || (highest_ready_priority == rtos_running_task->priority
-          && (rtos_ticks - last_switch_ticks) > SCHEDULER_TIMESLICE)) {
+          && (rtos_ticks - last_switch_ticks) >= SCHEDULER_TIMESLICE)) {
     last_switch_ticks = rtos_ticks;
 
     // If the current task is being preempted, append the current task to the end of the appropriate ready queue
