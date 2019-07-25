@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>__RTGT_UART TEST_SEMAPHORE</Define>
+              <Define>__RTGT_UART TEST_MUTEX_OWNER_RELEASE</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
@@ -451,6 +451,11 @@
               <FileName>test_scheduler_timeslice.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\test\test_scheduler_timeslice.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_mutex_owner_release.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\test\test_mutex_owner_release.c</FilePath>
             </File>
           </Files>
         </Group>
